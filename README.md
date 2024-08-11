@@ -311,11 +311,27 @@ OMV extras is now installed. You can now install more plugin and install docker 
 
 ### Network Settings Overview
 
-This section briefly goes over the network settings options and what I personally changed or added for my use case.
+_11/08/2024_
 
----
+This section briefly goes over the network settings options and what I personally changed or added for my use case. The options are as follows:
 
-### Drive Setup
+- General
+  
+  - Hostname - Name given to the server, setup on initial install but changeable here.
+  
+  - Domain Name - If you have a public domain e.g. google you can use that here. I do not and this server is local only so I use local.
+
+- Interfaces - Here you can create or identify different network interfaces and see all their info. You can also set things like static IP addresses here as well. I have not changed the default options of my system.
+
+- Proxy - Here you can enable a http, https or ftp proxy. I do not have any proxy setup.
+
+- Firewall
+  
+  - Rules - Here you can setup firewall rules on IPV4 and IPV6 network interfaces. I do not have any firewall rules setup.
+
+
+
+### Drive Setup/ Storage Page
 
 Now that the server has the most basic setup completed, further drives can be mounted to the server. Mounting a drive allows the server to use the drive through the operating systems (Open Media Vault) file system to make files/ folders to store or run services.
 
