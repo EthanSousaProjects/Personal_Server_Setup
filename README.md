@@ -180,9 +180,134 @@ Once all the relevant widgets have been chosen, click save at the bottom of the 
 
 ### System Settings Overview
 
-This section briefly goes over the system settings options and defines what I personally changed or added for my use case.
+_11/08/2024_
 
----
+This section briefly goes over the system settings options and defines what I personally changed or added for my use case. When making changes, a Pending configuration changes panel will appear at the top of the screen. Just click on the check mark to apply.
+
+![](Initial_OMV_Install/Pending_Confireration_Changes.png)
+
+The options are as follows:
+
+- Workbench
+  
+  - Web UI Port - Default of 80 I personally changed to 2000 as I will have nginx proxy manager set to port 80 in the future. If changing make sure to connect via <IP address>:<Port Number>
+  
+  - Auto Logout - Default of 5 minutes, changed to 15 mins.
+  
+  - Secure Connection Options - This is to setup a https connection instead of a http connection. Https is a secure encrypted connection to the server. I currently do not have this enabled as this server is on a network with only  my devices. I may set it up in the future.
+    
+    - SSL/TLS enabled - Enable http connection
+      
+      - Certificate - Choosing which generated certificate to use. Allows you to create new one as well.
+      
+      - Port - port off Web UI - Port connection option to https connection.
+    
+    - Force SSL/TLS - Make https only available connection option.
+
+- Date & Time
+  
+  - Time zone - set your time zone. Should be setup from initial install.
+  
+  - Use NTP server - NTP(Network Time protocol) are servers that connect to you server to keep the server time accurate.
+    
+    - Time Servers - Comma separated list of time servers. Should have been setup on initial install. I use `pool.ntp.org` which should work everywhere. research servers to choose what is best for you.
+    
+    - Allowed Clients - Client IP address/ host names that can connect to NTP server. I leave mine blank.
+
+- Notification
+  
+  - Settings
+    - Enabled - Enable email notifications from server. I do not have them enabled.
+      - SMTP server - Server address to use
+      - SMTP port - port number of server
+      - Encryption Mode - Options of `None, SSL/TLS, STARTTLS, Auto` you should have some encryption enabled to help protect data during transit on the internet.
+      - Sender email - User Email notification emails will be sent from.
+      - Authentication Required - Does the email account need to be logged into.
+        - User name
+        - Password
+      - Recipient - Email that will receive notification email.
+        - Primary email
+        - Secondary Email
+      - Test Button - To send a test email out.
+  - Events - Options of things that will send notification emails out.
+    - CPU usage
+    - File systems
+    - Load Average
+    - Memory usage
+    - Process monitoring
+    - S.M.A.R.T.
+
+- Power Management
+  
+  - Settings
+    
+    - Monitoring - Enable monitoring of the system to specify CPU status and select appropriate level. I have it enabled.
+    
+    - Power Button - Specify what your systems power button does. options are `Nothing, power Off, Standby`. I set to power off.
+    
+    - Standby mode - specifies what your system should do when put in standby mode. Options are `Nothing, power Off, Standby`. i put mine to power off.
+  
+  - Scheduled Tasks - In this section you can create scheduled power based tasks. You can create a `standby, shutdown or reboot` task. These tasks can be executed at:
+    
+    - A specific date time down to minutes, 
+    
+    - Every N minute, hour, day of month.
+    
+    - Or Hourly, Daily, Weekly, Monthly, Yearly
+    
+    - I personally have a reboot task that runs monthly. This normally means my server reboots every first day on the month.
+
+- Monitoring
+  
+  - Enabled - Specifies if performance stats are collected and graphed. I enable it to see performance over time.
+
+- Scheduled Tasks - Here you can create cron tasks on your server. These are custom commands to do what ever you want. These tasks can be executed at:
+  
+  - A specific date time down to minutes,
+  
+  - Every N minute, hour, day of month.
+  
+  - Hourly, Daily, Weekly, Monthly, Yearly.
+  
+  - Or at reboot.
+  
+  - I personally do not run any cron tasks.
+
+- Certificates
+  
+  - SSH - In this page you can create or import SSH certificates. This is used to secure SSH access. I do not have any SSH certificates.
+  
+  - SSL - In this page you can create or import SSL certificates. This is used to secure an https connection. I do not have any SSL certificates.
+
+- Update Management
+  
+  - Updates - In this page you can check for new updates and Install them.
+  
+  - Settings
+    
+    - Pre-release updates - I do not have this enabled.
+    
+    - Community-maintained updates - I do not have this enabled.
+
+- Plugins - Here you can install plugins to add functionality to you server. Have a look through it to see if any are interesting to you. There are more plugins in OMV extras which must be installed separately.
+
+#### Plugins OMV Extras
+
+There are extra plugins for OMV which are called [OMV extras](https://wiki.omv-extras.org/doku.php?id=start). These extras expand the functionality of OMV. I personally use it and it is simple to install. The instructions to install this are detailed below:
+
+1) Connect to the server via SSH (Secure Shell) on an account with root/ sudo access. A common method is to use [PuTTY](https://putty.org/). You can also use things like the terminal or command prompt (name depends on platform). i will be using the windows command prompt.
+   
+   1) To do this I open the command promt in windows and use the command `SSH <root/user account>@<IP Address/ Host Name>`. 
+   
+   2) It will ask you about a key finger print if you have not connected before. type yes then enter to approve the connection to the server.
+   
+   3) It will then ask you for the password to the account you want to login to. Type the password out, it will not appear, then hit enter. You are now connected via SSH to your server.
+
+2) You can install OMV extra via the command on the [OMV extras](https://wiki.omv-extras.org/doku.php?id=start) website. When I installed OMV extras on 11/08/2024 the command was as follows: `wget -O - https://github.com/OpenMediaVault-Plugin-Developers/packages/raw/master/install | bash`. For a non root acccount make sure you have `sudo` at the start of the command. Once you hit enter the install should run.
+
+3) It is good practice to reboot your server when performing an install like this. You can reboot it from the OMV web interface or, you can reboot from the command line through the command `reboot`. Remember to use `sudo` for non root accounts.
+
+OMV extras is now installed. You can now install more plugin and install docker under the omv-extras page in the system settings panel.
 
 ### Network Settings Overview
 
