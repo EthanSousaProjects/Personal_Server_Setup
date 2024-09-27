@@ -297,17 +297,17 @@ There are extra plugins for OMV which are called [OMV extras](https://wiki.omv-e
 
 1) Connect to the server via SSH (Secure Shell) on an account with root/ sudo access. A common method is to use [PuTTY](https://putty.org/). You can also use things like the terminal or command prompt (name depends on platform). i will be using the windows command prompt.
    
-   1) To do this I open the command promt in windows and use the command `SSH <root/user account>@<IP Address/ Host Name>`. 
+   1) To do this I open the command prompt in windows and use the command `SSH <root/user account>@<IP Address/ Host Name>`. 
    
-   2) It will ask you about a key finger print if you have not connected before. type yes then enter to approve the connection to the server.
+   2) It will ask you about a key finger print if you have not connected before. Type yes then enter to approve the connection to the server.
    
    3) It will then ask you for the password to the account you want to login to. Type the password out, it will not appear, then hit enter. You are now connected via SSH to your server.
 
-2) You can install OMV extra via the command on the [OMV extras](https://wiki.omv-extras.org/doku.php?id=start) website. When I installed OMV extras on 11/08/2024 the command was as follows: `wget -O - https://github.com/OpenMediaVault-Plugin-Developers/packages/raw/master/install | bash`. For a non root acccount make sure you have `sudo` at the start of the command. Once you hit enter the install should run.
+2) You can install OMV extra via the command on the [OMV extras](https://wiki.omv-extras.org/doku.php?id=start) website. When I installed OMV extras on 11/08/2024 the command was as follows: `wget -O - https://github.com/OpenMediaVault-Plugin-Developers/packages/raw/master/install | bash`. For a non root account make sure you have `sudo` at the start of the command. Once you hit enter the install should run.
 
 3) It is good practice to reboot your server when performing an install like this. You can reboot it from the OMV web interface or, you can reboot from the command line through the command `reboot`. Remember to use `sudo` for non root accounts.
 
-OMV extras is now installed. You can now install more plugin and install docker under the omv-extras page in the system settings panel.
+OMV extras is now installed. You can now install more plugins and install docker under the omv-extras page in the system settings panel.
 
 ### Network Settings Overview
 
@@ -399,7 +399,7 @@ You will now be in a mount page, select the drive you just setup and set a Usage
 
 Once you have clicked save and applied changes, you have mounted a drive to your server.
 
-To used the drive in OMV you must create a Shared folder in the drive. To do this, go into the Shared Folders sub page in the Storage page and click on the circle with a plus in it. You will be taken to a create folder page.
+To use the drive in OMV you must create a Shared folder in the drive. To do this, go into the Shared Folders sub page in the Storage page and click on the circle with a plus in it. You will be taken to a create folder page.
 
 ![](Initial_OMV_Install/Share_Folders_Create.png)
 
@@ -415,11 +415,31 @@ Once you have completed creating the shared folder, it can then be used on the s
 
 ##### RAID ZFS Array
 
-_15/08/2024_
+_27/09/2024_
+
+I will be mounting my 8TB hard drives in a mirrored ZFS array. To accomplish this  you first need to install the ZFS plugin for OMV. This can be found in the `System>Plugins` page.
+
+![](Initial_OMV_Install/ZFS_Plugin.png)
+
+Once installed, Navigate to the page `Storage>zfs>Pools` , here we will create our mirrored raid array. Click on the add pool button.
+
+The options I will select in the create pool page are as follows:
+
+- Name - `Mass_Storage`
+
+- Pool type - `Mirror`
+
+- Devices - I selected my 2 Hard drives which have an ID of `/dev/sda` and `/dev/sdb`.
+
+All other settings I left as their default. I then clicked save. Once saved apply the changes through the prompt.
+
+Now a ZFS mirrored array is mounted to the server. We can now make Shared folders that our services can use just like we did for the single SSD drive.
+
+I will have a file system with the layout described in the image bellow to help organize my services so that it is easier to find via SSH. If you want to replicate this make sure your relative path is something along the lines of `<First Folder>/<Second Folder>/`, making sure a `/` is always at the end.
 
 ![](Initial_OMV_Install/HDD_Directory_Tree.png)
 
----
+It is best practice to create a new folder for each service so that you know exactly where all the data for that service is stored. Once you have created all of your folders remember to apply all the changes.
 
 ### Services
 
@@ -434,6 +454,8 @@ _15/08/2024_
 ---
 
 # Remote Access Zero tier
+
+To do this linkely have to install curl `sudo apt install curl`.
 
 ---
 
