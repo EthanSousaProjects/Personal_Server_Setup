@@ -443,15 +443,47 @@ It is best practice to create a new folder for each service so that you know exa
 
 ### Services
 
----
+_28/09/2024_
 
-### Users
+This page shows all the installed services that are running and allows you to change their settings. This is where the installed plugin settings will most likely be. For now I will leave it as it is until I am ready to setup my services.
 
----
+### User Management
+
+In this page we can setup new users on our server. The different page options are as follows:
+
+- Settings - Allows you to enable the users home directory and specify a location.
+
+- Users - This is where you can create, import, and edit users which can be used for certain tasks instead of using the admin user to run all tasks. When it is relevant I will create a new user.
+
+- Groups - This is where you can create, Import and edit user groups. This is where you can group together users for specific tasks.
 
 ### Diagnostics
 
----
+This page gives system information to understand why an issue maybe occurring on your server. There are many pages which are as follows:
+
+- System Information - Describes Basic Information about your server.
+
+- System Logs - View the system logs.
+
+- Processes - Like Task manager for windows or top in the command line for Linux.
+
+- Services - Status of services running.
+
+- Report - Generate a report about your system.
+
+- Performance statistics - Graphs to show how your system is performing hourly, daily, weekly, monthly and yearly.
+  
+  - CPU - CPU usage.
+  
+  - File System Usage - drive used and free storage.
+  
+  - Load Average - Power usage of system.
+  
+  - Memory Usage - Free and Used RAM.
+  
+  - Network Interface - Network Traffic.
+  
+  - Uptime - Server powered on Time.
 
 # Remote Access Zero tier
 
