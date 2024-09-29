@@ -485,16 +485,88 @@ This page gives system information to understand why an issue maybe occurring on
   
   - Uptime - Server powered on Time.
 
+# Data Backup
+
+_28/09/2024_
+
+One of the first services I will setup is making sure that the data on my server is backed up. Backing up data is very important incase of server failure or corruption where data on the primary drives has been lost. This allows us to still have access to the data through our backups.
+
+The recommended strategy for building a backup system is to take into account the [3-2-1 backup rule](https://www.seagate.com/gb/en/blog/what-is-a-3-2-1-backup-strategy/). This rule states there must be:
+
+- 3 copies of your data
+
+- 2 Different mediums
+
+- 1 remote/ offsite backup.
+
+The 1 remote/ offsite backup is one many people forget to implement. It is normally only used in disaster scenarios like the building your main and local backup servers are in have burned down. The remote backup will save you here. Your remote backup can be something like a cloud storage service or your own server at a friends house.
+
+For 2 different mediums this can be something like SSDs vs HDDs or even tape storage but, the way I interpret it is to use 2 systems that do not share any components. So I use another completely separate server with a different power supply, motherboard, drives, etc. This is so that if my main server fails. My other server will have all the data backed up onto it.
+
+For 3 different copies if you accomplish the 1 remote and 2 different mediums you should have 3 copies: one on the server running services, one on the local backup server and one remote copy.
+
+## My server backup Plan
+
+My Backup plan for my server involves creating snapshots of all my data on the local server and then syncing these files to my local backup server and my remote one.
+
+I will use the [openmediavault-backup plugin](https://github.com/OpenMediaVault-Plugin-Developers/openmediavault-backup) to backup the Open Media Vault system it's self. I will then backup the data drives using the  [rsnapshot plugin](https://github.com/OpenMediaVault-Plugin-Developers/openmediavault-rsnapshot). All data snapshots will be saved to the 2, 8TB HDD mirrored array in a common folder which is then synced to both the local backup server and the remote backup server through likely something like [Syncthing](https://syncthing.net/). A diagram of how my server backup plan will work is shown bellow.
+
+![](Data_Backup/Server_Backup_Plan_Chart.png)
+
+### Main Server OMV System Backup
+
+To backup my OMV system data, I will first install the [openmediavault-backup plugin](https://github.com/OpenMediaVault-Plugin-Developers/openmediavault-backup) through the OMV plugin section.
+
+![](Data_Backup/OMV_System_Backup_Plugin.png)
+
+Once installed, you can find the backup settings in `System > Backup` page. Here we can adjust the settings for the OMV system backup. Firstly, I will make a new shared folder in the main HDD_Storage space to locate the backed up disc images.
+
+![](Data_Backup/OMV_System_Backup_Shared_Folder.png)
+
+Remember to apply the pending configuration change.
+
+Once that change has been made I will go back to the `System > Backup` page will apply the following settings:
+
+- Settings - Page to adjust OMV system backup settings
+  
+  - Shared Folder - Target for where backups will be saved.
+  
+  - Method - I will be using `dd full disk` as it will clone my entire boot drive to a compressed image file which can be used if the boot drive fails. There are other options available like dd, fsachiver, borgbackup and rsync which maybe better for your use case.
+  
+  - Root device - I will not change this setting
+  
+  - Keep - Describes the number backup image snapshots it should keep. I will have 4 for my use case.
+
+- Scheduled Backup - Page to adjust when backups will run.
+  
+  - I will enable Scheduled Backups to run Weekly.
+  
+  - Remember to apply the pending change.
+
+### SSD and HDD storage Snapshots
+
+I will be creating snapshots of all my data which will then be syncing to my local and remote backup servers. These snapshots will be of the SSD and HDD storage areas and stored on the HDDs. I will first install the rsnapshot plugin.
+
+![](Data_Backup/Rsnapshot_Plugin.png)
+
+Once Installed I will navigate to the page `Services > Rsnapshot` to add rsnapshot jobs.
+
+The first job will be for anything stored on the HDDs. The data on the HDDs will be more longer term files compared to the SSD based files. Therefore, I will keep 5 monthly snapshots which will translate to approximately one snapshot a week. All other settings I left as their defaults or set to zero.
+
+![](Data_Backup/HDD_Snapshot_Settings.png)
+
+Next I will create a snapshot job for the SSD data. As this data on the SSDs will update frequently in comparison to the HDDs, I will run 4 weekly snapshots and 3 monthly snapshots. This should give me a snapshot of the data nearly every other day. I will also gain some slightly longer term snapshots just incase i make a mistake in a file and the weekly snapshot gets over written before it is recovered. All other settings I left as their defaults or set to zero.
+
+![](Data_Backup/SSD_Snapshot_Settings.png)
+
+Remember to apply the configuration changes once the jobs have been created.
+
+### Local and Remote snapshot copies
+
+
+
 # Remote Access Zero tier
 
-To do this linkely have to install curl `sudo apt install curl`.
+To do this likely have to install curl `sudo apt install curl`.
 
----
-
-# First Services
-
-## Backup of data
-
----
-
-# 
+--- 
