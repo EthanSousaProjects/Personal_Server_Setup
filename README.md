@@ -1001,6 +1001,8 @@ All other properties should be self explanatory. I also made an application link
 
 I would recommend bookmarking the dashboard into your browser so you do not have to remember the IP address and port.
 
+__Important Note -__ If you use host names instead of IP addresses, you can have only one link to your service via `<htttp/https depends on connection type>://<host name>:<Port>`. I personally now just use the host names in my http/https link. I did keep the local and ZeroTier tags for some services which I have on PCs I do not know the host name of.
+
 ## Updates and backup
 
 One thing that I want to setup for all docker containers including Heimdall is automatic backups and updates. The OMV plugin allows for this to be the case. To accomplish this, navigate to `Services > Compose > Schedule` and click on the white plus in a blue circle.
