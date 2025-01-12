@@ -669,86 +669,6 @@ Enter the network ID in the setup menu and save it. When ready, activate the con
 
 Note that ZeroTier acts like a VPN on mobile platforms so if you want to use another VPN you must disable ZeroTier to use it. I tend to only connect to to ZeroTier on mobile if i need to and tend not to keep it active.
 
-# Data Backup
-
-_28/09/2024_
-
-One of the first services I will setup is making sure that the data on my server is backed up. Backing up data is very important incase of server failure or corruption where data on the primary drives has been lost. This allows us to still have access to the data through our backups.
-
-The recommended strategy for building a backup system is to take into account the [3-2-1 backup rule](https://www.seagate.com/gb/en/blog/what-is-a-3-2-1-backup-strategy/). This rule states there must be:
-
-- 3 copies of your data
-
-- 2 Different mediums
-
-- 1 remote/ offsite backup.
-
-The 1 remote/ offsite backup is one many people forget to implement. It is normally only used in disaster scenarios like the building your main and local backup servers are in have burned down. The remote backup will save you here. Your remote backup can be something like a cloud storage service or your own server at a friends house.
-
-For 2 different mediums this can be something like SSDs vs HDDs or even tape storage but, the way I interpret it is to use 2 systems that do not share any components. So I use another completely separate server with a different power supply, motherboard, drives, etc. This is so that if my main server fails. My other server will have all the data backed up onto it.
-
-For 3 different copies if you accomplish the 1 remote and 2 different mediums you should have 3 copies: one on the server running services, one on the local backup server and one remote copy.
-
-## My server backup Plan
-
-My Backup plan for my server involves creating snapshots of all my data on the local server and then syncing these files to my local backup server and my remote one.
-
-I will use the [openmediavault-backup plugin](https://github.com/OpenMediaVault-Plugin-Developers/openmediavault-backup) to backup the Open Media Vault system it's self. I will then backup the data drives using the  [rsnapshot plugin](https://github.com/OpenMediaVault-Plugin-Developers/openmediavault-rsnapshot). All data snapshots will be saved to the 2, 8TB HDD mirrored array in a common folder which is then synced to both the local backup server and the remote backup server through likely something like [Syncthing](https://syncthing.net/). A diagram of how my server backup plan will work is shown bellow.
-
-![](Data_Backup/Server_Backup_Plan_Chart.png)
-
-### Main Server OMV System Backup
-
-To backup my OMV system data, I will first install the [openmediavault-backup plugin](https://github.com/OpenMediaVault-Plugin-Developers/openmediavault-backup) through the OMV plugin section.
-
-![](Data_Backup/OMV_System_Backup_Plugin.png)
-
-Once installed, you can find the backup settings in `System > Backup` page. Here we can adjust the settings for the OMV system backup. Firstly, I will make a new shared folder in the main HDD_Storage space to locate the backed up disc images.
-
-![](Data_Backup/OMV_System_Backup_Shared_Folder.png)
-
-Remember to apply the pending configuration change.
-
-Once that change has been made I will go back to the `System > Backup` page will apply the following settings:
-
-- Settings - Page to adjust OMV system backup settings
-  
-  - Shared Folder - Target for where backups will be saved.
-  
-  - Method - I will be using `dd full disk` as it will clone my entire boot drive to a compressed image file which can be used if the boot drive fails. There are other options available like dd, fsachiver, borgbackup and rsync which maybe better for your use case.
-  
-  - Root device - I will not change this setting
-  
-  - Keep - Describes the number backup image snapshots it should keep. I will have 4 for my use case.
-
-- Scheduled Backup - Page to adjust when backups will run.
-  
-  - I will enable Scheduled Backups to run Weekly.
-  
-  - Remember to apply the pending change.
-
-### SSD and HDD storage Snapshots
-
-I will be creating snapshots of all my data which will then be syncing to my local and remote backup servers. These snapshots will be of the SSD and HDD storage areas and stored on the HDDs. I will first install the rsnapshot plugin.
-
-![](Data_Backup/Rsnapshot_Plugin.png)
-
-Once Installed I will navigate to the page `Services > Rsnapshot` to add rsnapshot jobs.
-
-The first job will be for anything stored on the HDDs. The data on the HDDs will be more longer term files compared to the SSD based files. Therefore, I will keep 5 monthly snapshots which will translate to approximately one snapshot a week. All other settings I left as their defaults or set to zero.
-
-![](Data_Backup/HDD_Snapshot_Settings.png)
-
-Next I will create a snapshot job for the SSD data. As this data on the SSDs will update frequently in comparison to the HDDs, I will run 4 weekly snapshots and 3 monthly snapshots. This should give me a snapshot of the data nearly every other day. I will also gain some slightly longer term snapshots just incase i make a mistake in a file and the weekly snapshot gets over written before it is recovered. All other settings I left as their defaults or set to zero.
-
-![](Data_Backup/SSD_Snapshot_Settings.png)
-
-Remember to apply the configuration changes once the jobs have been created.
-
-### Local and Remote snapshot copies
-
----
-
 # Heimdall
 
 _13/10/2024_
@@ -759,7 +679,7 @@ It must be noted that I will be using [Heimdalls Linux Server docker image](http
 
 ## File Setup
 
-For the Heimdall image, we need a folder for all of the config files of the container. I will create one on the SSD in the local only content so that it has fast access to those files. I will name it `Heimdall` for future reference. My folder setup is the image bellow:
+For the Heimdall image, we need a folder for all of the config files of the container. I will create one on the SSD in the local only content folder so that it has fast access to those files. I will name it `Heimdall` for future reference. My folder setup is the image bellow:
 
 ![](Docker_Containers/Dashboard_Heimdall/Config_Folder_Creation.png)
 
@@ -1026,3 +946,282 @@ At the end of the Schedule creation you should see something like the image bell
 Once completed, save the task and apply the change.
 
 We have now setup automatic backups and updates of the Heimdall container.
+
+# Data Backup
+
+_28/09/2024_
+
+One of the first services I will setup is making sure that the data on my server is backed up. Backing up data is very important incase of server failure or corruption where data on the primary drives has been lost. This allows us to still have access to the data through our backups.
+
+The recommended strategy for building a backup system is to take into account the [3-2-1 backup rule](https://www.seagate.com/gb/en/blog/what-is-a-3-2-1-backup-strategy/). This rule states there must be:
+
+- 3 copies of your data
+
+- 2 Different mediums
+
+- 1 remote/ offsite backup.
+
+The 1 remote/ offsite backup is one many people forget to implement. It is normally only used in disaster scenarios like the building your main and local backup servers are in have burned down. The remote backup will save you here. Your remote backup can be something like a cloud storage service or your own server at a friends house.
+
+For 2 different mediums this can be something like SSDs vs HDDs or even tape storage but, the way I interpret it is to use 2 systems that do not share any components. So I use another completely separate server with a different power supply, motherboard, drives, etc. This is so that if my main server fails. My other server will have all the data backed up onto it.
+
+For 3 different copies if you accomplish the 1 remote and 2 different mediums you should have 3 copies: one on the server running services, one on the local backup server and one remote copy.
+
+## My server backup Plan
+
+My Backup plan for my server involves creating snapshots of all my data on the local server and then syncing these files to my local backup server and my remote one.
+
+I will use the [openmediavault-backup plugin](https://github.com/OpenMediaVault-Plugin-Developers/openmediavault-backup) to backup the Open Media Vault system it's self. I will then backup the data drives using the  [rsnapshot plugin](https://github.com/OpenMediaVault-Plugin-Developers/openmediavault-rsnapshot). All data snapshots will be saved to the 2, 8TB HDD mirrored array in a common folder which is then synced to both the local backup server and the remote backup server through likely something like [Syncthing](https://syncthing.net/). A diagram of how my server backup plan will work is shown bellow.
+
+![](Data_Backup/Server_Backup_Plan_Chart.png)
+
+### Main Server OMV System Backup
+
+To backup my OMV system data, I will first install the [openmediavault-backup plugin](https://github.com/OpenMediaVault-Plugin-Developers/openmediavault-backup) through the OMV plugin section.
+
+![](Data_Backup/OMV_System_Backup_Plugin.png)
+
+Once installed, you can find the backup settings in `System > Backup` page. Here we can adjust the settings for the OMV system backup. Firstly, I will make a new shared folder in the main HDD_Storage space to locate the backed up disc images.
+
+![](Data_Backup/OMV_System_Backup_Shared_Folder.png)
+
+Remember to apply the pending configuration change.
+
+Once that change has been made I will go back to the `System > Backup` page will apply the following settings:
+
+- Settings - Page to adjust OMV system backup settings
+  
+  - Shared Folder - Target for where backups will be saved.
+  
+  - Method - I will be using `dd full disk` as it will clone my entire boot drive to a compressed image file which can be used if the boot drive fails. There are other options available like dd, fsachiver, borgbackup and rsync which maybe better for your use case.
+  
+  - Root device - I will not change this setting
+  
+  - Keep - Describes the number backup image snapshots it should keep. I will have 4 for my use case.
+
+- Scheduled Backup - Page to adjust when backups will run.
+  
+  - I will enable Scheduled Backups to run Weekly.
+  
+  - Remember to apply the pending change.
+
+### SSD and HDD storage Snapshots
+
+I will be creating snapshots of all my data which will then be syncing to my local and remote backup servers. These snapshots will be of the SSD and HDD storage areas and stored on the HDDs. I will first install the rsnapshot plugin.
+
+![](Data_Backup/Rsnapshot_Plugin.png)
+
+Once Installed I will navigate to the page `Services > Rsnapshot` to add rsnapshot jobs.
+
+The first job will be for anything stored on the HDDs. The data on the HDDs will be more longer term files compared to the SSD based files. Therefore, I will keep 5 monthly snapshots which will translate to approximately one snapshot a week. All other settings I left as their defaults or set to zero.
+
+![](Data_Backup/HDD_Snapshot_Settings.png)
+
+Next I will create a snapshot job for the SSD data. As this data on the SSDs will update frequently in comparison to the HDDs, I will run 4 weekly snapshots and 3 monthly snapshots. This should give me a snapshot of the data nearly every other day. I will also gain some slightly longer term snapshots just incase i make a mistake in a file and the weekly snapshot gets over written before it is recovered. All other settings I left as their defaults or set to zero.
+
+![](Data_Backup/SSD_Snapshot_Settings.png)
+
+Remember to apply the configuration changes once the jobs have been created.
+
+### Local and Remote snapshot copies
+
+---
+
+## Windows and Linux Based Backups (UrBackup)
+
+_11/01/2025_
+
+For my windows and Linux based systems I will be running full incremental system backups including all data drives. I do this incase I ever have an issue with my system drives or systems as a whole. This allows me to restore onto all new SSDs or systems (laptops, PCs, VMs) if required. These backups will be needed in a worse case scenario like: the loss of a laptop, hardware failure or a broken install of an OS.
+
+For the backups of Windows and Linux systems I will be using a program called [UrBackup](https://www.urbackup.org/index.html). This program can do full system backups of Linux, MAC and Windows systems. I will use something else for any MACs which I have described in another section. For individual files/ folders I will run [Syncthing](https://syncthing.net/) on all platforms but, you could use UrBackup for this use case as well. I will discuss Syncthing in a different section when I set it up on this server.
+
+### Folder Setup
+
+To setup [UrBackup](https://www.urbackup.org/index.html), there are a few folders I want to set up first.
+
+As I will eventually include an area for my families computers/ phones, I want to setup a folder in the HDD_Storage area for only myself. Due to how URbackup works this will require me to make a new UrBackup container for my families computers but, as I will use the docker method it should be ok. Some added configuration maybe needed when doing my families PCs.
+
+As this is mass remote data, I will create an Ethan folder in the `HDD_Storage > Remote_Content` folder (named `Remote_Content_HDD` on my server). When i eventually add my families computers there will be a folder for them as well. The image bellow shows how the folder structure will look for UrBackup for both my family and myself for reference.
+
+![](UrBackup/Backup_Storage_Location_Diagram.png)
+
+UrBackup also requires a database. In the docker container you specify the folder which this will be contained in. Therefore, I will also create a folder on the SSD for the database for fast access. I will name the folder `Eth_UrBackup` and it will sit under the Local_Only_Content folder. When I setup my families backup content I will do the same.
+
+![](UrBackup/Data_Base_Folder_Setup.png)
+
+Making folders is that same as previously discussed in this README.md through OMV shared folders. Just remember:
+
+- Typing in the correct Relative path including the `/` at the end.
+
+- Giving it the permissions Admin and Users read/write but others no access.
+
+- Apply the pending configuration changes when completed.
+
+An example of the database folder setup is shown bellow:
+
+![](UrBackup/UrBackup_Database_Folder_Setup_Example.png)
+
+Through hind sight with this in future I would have named this folder something along the lines of `Eth_UrBackup_Database` or something similar to help with names.
+
+Make sure to copy the absolute path of both folders created for the compose file.
+
+Note that you may have to show the Absolute path column if it is not appearing already using the table column option button.
+
+![](Docker_Containers/Absolute_Folder_Path.png)
+
+### Making Compose File
+
+For now i will be using the recommended compose file to setup my personal UrBackup target. When I setup my families UrBackup server i will write about the changes made but as of writing I am unsure of the compose file setup.
+
+The [recommend compose file](https://hub.docker.com/r/uroni/urbackup-server) is as of follows:
+
+`version: '2'`
+
+`services:
+  urbackup:
+    image: uroni/urbackup-server:latest
+    container_name: urbackup
+    restart: unless-stopped
+    environment:
+      - PUID=1000 # Enter the UID of the user who should own the files here
+      - PGID=100  # Enter the GID of the user who should own the files here
+      - TZ=Europe/Berlin # Enter your timezone
+    volumes:
+      - /path/to/your/database/folder:/var/urbackup
+      - /path/to/your/backup/folder:/backups
+      # Uncomment the next line if you want to bind-mount the www-folder
+      #- /path/to/wwwfolder:/usr/share/urbackup
+    network_mode: "host"
+    # Uncomment the following two lines if you're using BTRFS support
+    #cap_add:
+    #  - SYS_ADMIN
+    # Uncomment the following two lines if you're using ZFS support
+    #devices:
+    #  - /dev/zfs:/dev/zfs`
+
+The changes I will make are as of follows:
+
+- Changing the `container_name` to `eth_urbackup`.
+
+- `PUID` to `1000` and `PGID` to `100` for my docker user setup in a separate section.
+
+- Enter my time zone based on the [TZ codes](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones). UK is `Europe/London`.
+
+- Volumes changed to:
+  
+  - From `/path/to/your/database/folder:/var/urbackup` to the absolute path of the `Eth_Backup` folder setup in the folder set up section. `/srv/dev-disk-by-uuid-00337ac1-aca8-4dc6-b5d7-dfaf50835ac5/SSD_Storage/Local_Only_Content/Eth_UrBackup:/var/urbackup`
+  
+  - From `/path/to/your/backup/folder:/backups`  to the database folder absolute path. `/Mass_Storage/HDD_Storage/Remote_Content_HDD/Ethan_Files/Eth_Full_PC_Backups/Eth_UrBackup_Backups:/backups`
+
+- I have also changed the port numbers by commenting out the `network_mode: "host"` line and adding the following underneath:
+  
+  - `ports:` in line with where the network_mode line was
+  
+  - Tabbed in the following required port numbers based on the [UrBackup manual](https://www.urbackup.org/administration_manual.html#x1-9000010.3). Remember that the one on the left is what is externally seen while the ones on the right are internally seen by the container and are not to be changed.
+    
+    - `- 2003:55413` for the FastCGI bit for the web interface.
+    
+    - `- 2004:55414` for the http web UI interface. This is the address you will type in when managing the server side settings (the `2004` number).
+    
+    - `- 2005:55415` the port that internet clients will connect to. This port `2005` remember it for later as you will need it on your clients.
+    
+    - `- 2006:35623` the UDP broadcast port for discovery ( i likely have messed up discovery by doing this but it is required if I am to have multiple instances of this container for different use cases.)
+  
+  - I have only done this to allow me to setup multiple container instances. To do that it involves using different port numbers. This does complicate the setup on the clients however. If you are just having one instance i recommend keeping the port numbers as their default but i thought i would include this incase someone else wants to replicate it.
+
+- I will uncomment the ZFS lines as my Hard drives are a ZFS mirrored array. You can probably not include this and it will be fine.
+
+So the full compose file for me will look like the following:
+
+`version: '2'`
+
+`services:
+  urbackup:
+    image: uroni/urbackup-server:latest
+    container_name: eth_urbackup
+    restart: unless-stopped
+    environment:
+      - PUID=1000 # Enter the UID of the user who should own the files here
+      - PGID=100  # Enter the GID of the user who should own the files here
+      - TZ=Europe/London # Enter your timezone
+    volumes:
+      - /srv/dev-disk-by-uuid-00337ac1-aca8-4dc6-b5d7-dfaf50835ac5/SSD_Storage/Local_Only_Content/Eth_UrBackup:/var/urbackup
+      - /Mass_Storage/HDD_Storage/Remote_Content_HDD/Ethan_Files/Eth_Full_PC_Backups/Eth_UrBackup_Backups:/backups
+      # Uncomment the next line if you want to bind-mount the www-folder
+      #- /path/to/wwwfolder:/usr/share/urbackup
+    #network_mode: "host"
+    ports:
+      - 2003:55413
+      - 2004:55414
+      - 2005:55415
+      - 2006:35623
+    # Uncomment the following two lines if you're using BTRFS support
+    #cap_add:
+    #  - SYS_ADMIN
+    # Uncomment the following two lines if you're using ZFS support
+    devices:
+      - /dev/zfs:/dev/zfs`
+
+Modify the compose file as you see fit.
+
+#### Launching, auto Backups and auto update container image
+
+To launch the UrBackup container it will be the same as the Heimdall container, navigate to `Services > Compose > Files`, select the UrBackup container and select the up button. It will be an arrow pointing up in a circle:
+
+![](UrBackup/Container_Launching.png)
+
+A screen with log commands will appear. Close this when you are done and you will see that the status has changed from `Down` to `Up`. The container is now running.
+
+![](UrBackup/Container_Is_Up.png)
+
+If like me you have set custom ports it will also show the port numbers. If you have not that will not show.
+
+To automatically backup and update this container image, I will include it in the scheduled task i created for Heimdall. I will navigate to `Services > Compose > Schedule` and click on the scheduled task that at reboot updates and backups containers that it is filtered for. I will then click the pen like icon to edit the task.
+
+![](UrBackup/Update_backup_Task_Edit.png)
+
+Once in the interface you will manually need to type in the filter as the web UI does not make it easy to select multiple containers. It must be noted that all container names must not include spaces. My filter I have to type `Heimdall,eth_urbackup` using commas (`,`) to separate out each container. You could also use `*` to do all containers but i do not as some later containers I add will update more frequently then only at reboot which happens once a month for me.
+
+![](UrBackup/Filter_Container_Backup_And_Update.png)
+
+You can check this works by selecting the scheduled task and clicking the run button. A prompt will come up asking you to start the task. Start the task. Log text will appear and at the end will say done.
+
+![](UrBackup/Compose_Task_Run.png)
+
+![](UrBackup/Compose_Task_Logs.png)
+
+Now if you navigate to `Services > Compose > Restore` you should see all your containers backed up in the page.
+
+![](UrBackup/Check_Backup_Worked.png)
+
+### Server Side Settings
+
+Now that the container is running. We can connect to it via a browser. Type in the following: `http://<host name/ Ip address>:<Port (your custom one or 55414 which is the default)>`. Therefore, for me I type in `http://hpz240nas.local:2004`. You can add this to your dashboard like [Heimdall](https://heimdall.site/) if required.
+
+On the home page we will be greeted by 
+
+---
+
+### Windows/ Linux Setup
+
+---
+
+## MAC backups (Time machine)
+
+For my MAC I will use a slightly different approach compared to my other systems as MAC devices have the built in system called "time machine". I will be using this application for backups of any MACs.
+
+### Folder Setup
+
+---
+
+### User Account Setup
+
+---
+
+### SMB Setup
+
+---
+
+### Setup on MAC
+
+---
