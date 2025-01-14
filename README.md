@@ -1043,11 +1043,11 @@ As I will eventually include an area for my families computers/ phones, I want t
 
 As this is mass remote data, I will create an Ethan folder in the `HDD_Storage > Remote_Content` folder (named `Remote_Content_HDD` on my server). When i eventually add my families computers there will be a folder for them as well. The image bellow shows how the folder structure will look for UrBackup for both my family and myself for reference.
 
-![](UrBackup/Backup_Storage_Location_Diagram.png)
+![](Docker_Containers/UrBackup/Backup_Storage_Location_Diagram.png)
 
 UrBackup also requires a database. In the docker container you specify the folder which this will be contained in. Therefore, I will also create a folder on the SSD for the database for fast access. I will name the folder `Eth_UrBackup` and it will sit under the Local_Only_Content folder. When I setup my families backup content I will do the same.
 
-![](UrBackup/Data_Base_Folder_Setup.png)
+![](Docker_Containers/UrBackup/Data_Base_Folder_Setup.png)
 
 Making folders is that same as previously discussed in this README.md through OMV shared folders. Just remember:
 
@@ -1059,7 +1059,7 @@ Making folders is that same as previously discussed in this README.md through OM
 
 An example of the database folder setup is shown bellow:
 
-![](UrBackup/UrBackup_Database_Folder_Setup_Example.png)
+![](Docker_Containers/UrBackup/UrBackup_Database_Folder_Setup_Example.png)
 
 Through hind sight with this in future I would have named this folder something along the lines of `Eth_UrBackup_Database` or something similar to help with names.
 
@@ -1067,7 +1067,7 @@ Make sure to copy the absolute path of both folders created for the compose file
 
 Note that you may have to show the Absolute path column if it is not appearing already using the table column option button.
 
-![](Docker_Containers/Absolute_Folder_Path.png)
+![](Docker_Containers/Docker_Containers/Absolute_Folder_Path.png)
 
 ## Making Compose File
 
@@ -1168,31 +1168,31 @@ Modify the compose file as you see fit.
 
 To launch the UrBackup container it will be the same as the Heimdall container, navigate to `Services > Compose > Files`, select the UrBackup container and select the up button. It will be an arrow pointing up in a circle:
 
-![](UrBackup/Container_Launching.png)
+![](Docker_Containers/UrBackup/Container_Launching.png)
 
 A screen with log commands will appear. Close this when you are done and you will see that the status has changed from `Down` to `Up`. The container is now running.
 
-![](UrBackup/Container_Is_Up.png)
+![](Docker_Containers/UrBackup/Container_Is_Up.png)
 
 If like me you have set custom ports it will also show the port numbers. If you have not that will not show.
 
 To automatically backup and update this container image, I will include it in the scheduled task i created for Heimdall. I will navigate to `Services > Compose > Schedule` and click on the scheduled task that at reboot updates and backups containers that it is filtered for. I will then click the pen like icon to edit the task.
 
-![](UrBackup/Update_backup_Task_Edit.png)
+![](Docker_Containers/UrBackup/Update_backup_Task_Edit.png)
 
 Once in the interface you will manually need to type in the filter as the web UI does not make it easy to select multiple containers. It must be noted that all container names must not include spaces. My filter I have to type `Heimdall,eth_urbackup` using commas (`,`) to separate out each container. You could also use `*` to do all containers but i do not as some later containers I add will update more frequently then only at reboot which happens once a month for me.
 
-![](UrBackup/Filter_Container_Backup_And_Update.png)
+![](Docker_Containers/UrBackup/Filter_Container_Backup_And_Update.png)
 
 You can check this works by selecting the scheduled task and clicking the run button. A prompt will come up asking you to start the task. Start the task. Log text will appear and at the end will say done.
 
-![](UrBackup/Compose_Task_Run.png)
+![](Docker_Containers/UrBackup/Compose_Task_Run.png)
 
-![](UrBackup/Compose_Task_Logs.png)
+![](Docker_Containers/UrBackup/Compose_Task_Logs.png)
 
 Now if you navigate to `Services > Compose > Restore` you should see all your containers backed up in the page.
 
-![](UrBackup/Check_Backup_Worked.png)
+![](Docker_Containers/UrBackup/Check_Backup_Worked.png)
 
 ## Server Side Overview
 
@@ -1202,13 +1202,13 @@ Now that the container is running. We can connect to it via a browser. Type in t
 
 On the home page we will be greeted by the backup status of all our clients. I have a client setup already but you will likely not have any. Here we are able to add our clients and check up on the status of all the client backups.
 
-![](UrBackup/UrBackup_Homepage.png)
+![](Docker_Containers/UrBackup/UrBackup_Homepage.png)
 
 If you have setup with the default ports you will not have to manually add a new client if they are on the same local network. If you have used custom ports like myself you will have to add a new client in the status page and change a setting of the web UI which i will discuss later in this section.
 
 To add a new client, click the add new client button on the Status page.
 
-![](UrBackup/UrBackup_Server_Setup_Client.png)
+![](Docker_Containers/UrBackup/UrBackup_Server_Setup_Client.png)
 
 You will be taken to a page where you can add a new internet/active client or discover a client on a new network. Due to me using custom ports I have to select the `Add new internet/active client` option and type in the name i gave to my client then click the `Add client` button for my client to appear.
 
@@ -1216,31 +1216,31 @@ If you have a client on your local network you could also type in the IP address
 
 On the activities page you will see the currently active tasks that UrBackup is running. It will show something like the image bellow. This page can be nice to give an overview of the tasks currently running if you are experiencing issues.
 
-![](UrBackup/Activities_Page.png)
+![](Docker_Containers/UrBackup/Activities_Page.png)
 
 On the backups page you will see an overview of off the clients and when the last backups occurred. This is useful to check if all clients have a semi recent backup.
 
-![](UrBackup/Backups_Page.png)
+![](Docker_Containers/UrBackup/Backups_Page.png)
 
 In the logs page you can see the logs from the activities of the UrBackup server with each client. You can filter by warnings or errors, see the live log for a specific client and when a user is created (done later in my write up) create a report to send of all the logs.
 
-![](UrBackup/Logs_Page.png)
+![](Docker_Containers/UrBackup/Logs_Page.png)
 
 In the statistics page you are able to see how much storage UrBackup as a whole is taking up over time and specific clients. You will also be able to see how much storage each client is taking up for file backups and image backups and the totals of each.
 
 Lastly you can see how much storage each client is taking up compared to each other.
 
- ![](UrBackup/Stats_Page_Storage_Usage_Overtime.png)
+![](Docker_Containers/UrBackup/Stats_Page_Storage_Usage_Overtime.png)
 
-![](UrBackup/Stats_Page_Client_Stats.png)
+![](Docker_Containers/UrBackup/Stats_Page_Client_Stats.png)
 
-![](UrBackup/Stats_Page_Storage_Allocation.png)
+![](Docker_Containers/UrBackup/Stats_Page_Storage_Allocation.png)
 
 ### Settings Page
 
 In the settings page you are able to change may aspects of the UrBackup Server. For all the settings there is a save button at the bottom. Make sure to click it and see the save settings successfully message appear to apply any changes made.
 
-![](UrBackup/Settings_Saved.png)
+![](Docker_Containers/UrBackup/Settings_Saved.png)
 
 A great thing about the settings pages is that any confusing settings have a question next to them which will take you to an FAQ page on your server describing the setting to you. The [UrBackup admin manual](https://www.urbackup.org/administration_manual.html) also contains great detail about all the [server settings](https://www.urbackup.org/administration_manual.html#x1-410008).
 
