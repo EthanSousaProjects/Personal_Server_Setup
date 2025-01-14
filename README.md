@@ -967,7 +967,7 @@ For 2 different mediums this can be something like SSDs vs HDDs or even tape sto
 
 For 3 different copies if you accomplish the 1 remote and 2 different mediums you should have 3 copies: one on the server running services, one on the local backup server and one remote copy.
 
-## My server backup Plan
+# My server backup Plan
 
 My Backup plan for my server involves creating snapshots of all my data on the local server and then syncing these files to my local backup server and my remote one.
 
@@ -975,7 +975,7 @@ I will use the [openmediavault-backup plugin](https://github.com/OpenMediaVault-
 
 ![](Data_Backup/Server_Backup_Plan_Chart.png)
 
-### Main Server OMV System Backup
+## Main Server OMV System Backup
 
 To backup my OMV system data, I will first install the [openmediavault-backup plugin](https://github.com/OpenMediaVault-Plugin-Developers/openmediavault-backup) through the OMV plugin section.
 
@@ -1005,7 +1005,7 @@ Once that change has been made I will go back to the `System > Backup` page will
   
   - Remember to apply the pending change.
 
-### SSD and HDD storage Snapshots
+## SSD and HDD storage Snapshots
 
 I will be creating snapshots of all my data which will then be syncing to my local and remote backup servers. These snapshots will be of the SSD and HDD storage areas and stored on the HDDs. I will first install the rsnapshot plugin.
 
@@ -1023,11 +1023,11 @@ Next I will create a snapshot job for the SSD data. As this data on the SSDs wil
 
 Remember to apply the configuration changes once the jobs have been created.
 
-### Local and Remote snapshot copies
+## Local and Remote snapshot copies
 
 ---
 
-## Windows and Linux Based Backups (UrBackup)
+# Windows and Linux Based Backups (UrBackup)
 
 _11/01/2025_
 
@@ -1035,7 +1035,7 @@ For my windows and Linux based systems I will be running full incremental system
 
 For the backups of Windows and Linux systems I will be using a program called [UrBackup](https://www.urbackup.org/index.html). This program can do full system backups of Linux, MAC and Windows systems. I will use something else for any MACs which I have described in another section. For individual files/ folders I will run [Syncthing](https://syncthing.net/) on all platforms but, you could use UrBackup for this use case as well. I will discuss Syncthing in a different section when I set it up on this server.
 
-### Folder Setup
+## Folder Setup
 
 To setup [UrBackup](https://www.urbackup.org/index.html), there are a few folders I want to set up first.
 
@@ -1069,7 +1069,7 @@ Note that you may have to show the Absolute path column if it is not appearing a
 
 ![](Docker_Containers/Absolute_Folder_Path.png)
 
-### Making Compose File
+## Making Compose File
 
 For now i will be using the recommended compose file to setup my personal UrBackup target. When I setup my families UrBackup server i will write about the changes made but as of writing I am unsure of the compose file setup.
 
@@ -1164,7 +1164,7 @@ So the full compose file for me will look like the following:
 
 Modify the compose file as you see fit.
 
-#### Launching, auto Backups and auto update container image
+### Launching, auto Backups and auto update container image
 
 To launch the UrBackup container it will be the same as the Heimdall container, navigate to `Services > Compose > Files`, select the UrBackup container and select the up button. It will be an arrow pointing up in a circle:
 
@@ -1194,34 +1194,120 @@ Now if you navigate to `Services > Compose > Restore` you should see all your co
 
 ![](UrBackup/Check_Backup_Worked.png)
 
-### Server Side Settings
+## Server Side Overview
+
+_13/01/2025_
 
 Now that the container is running. We can connect to it via a browser. Type in the following: `http://<host name/ Ip address>:<Port (your custom one or 55414 which is the default)>`. Therefore, for me I type in `http://hpz240nas.local:2004`. You can add this to your dashboard like [Heimdall](https://heimdall.site/) if required.
 
-On the home page we will be greeted by 
+On the home page we will be greeted by the backup status of all our clients. I have a client setup already but you will likely not have any. Here we are able to add our clients and check up on the status of all the client backups.
+
+![](UrBackup/UrBackup_Homepage.png)
+
+If you have setup with the default ports you will not have to manually add a new client if they are on the same local network. If you have used custom ports like myself you will have to add a new client in the status page and change a setting of the web UI which i will discuss later in this section.
+
+To add a new client, click the add new client button on the Status page.
+
+![](UrBackup/UrBackup_Server_Setup_Client.png)
+
+You will be taken to a page where you can add a new internet/active client or discover a client on a new network. Due to me using custom ports I have to select the `Add new internet/active client` option and type in the name i gave to my client then click the `Add client` button for my client to appear.
+
+If you have a client on your local network you could also type in the IP address or host name but, if you have used custom ports like me it may not work.
+
+On the activities page you will see the currently active tasks that UrBackup is running. It will show something like the image bellow. This page can be nice to give an overview of the tasks currently running if you are experiencing issues.
+
+![](UrBackup/Activities_Page.png)
+
+On the backups page you will see an overview of off the clients and when the last backups occurred. This is useful to check if all clients have a semi recent backup.
+
+![](UrBackup/Backups_Page.png)
+
+In the logs page you can see the logs from the activities of the UrBackup server with each client. You can filter by warnings or errors, see the live log for a specific client and when a user is created (done later in my write up) create a report to send of all the logs.
+
+![](UrBackup/Logs_Page.png)
+
+In the statistics page you are able to see how much storage UrBackup as a whole is taking up over time and specific clients. You will also be able to see how much storage each client is taking up for file backups and image backups and the totals of each.
+
+Lastly you can see how much storage each client is taking up compared to each other.
+
+ ![](UrBackup/Stats_Page_Storage_Usage_Overtime.png)
+
+![](UrBackup/Stats_Page_Client_Stats.png)
+
+![](UrBackup/Stats_Page_Storage_Allocation.png)
+
+### Settings Page
+
+In the settings page you are able to change may aspects of the UrBackup Server. For all the settings there is a save button at the bottom. Make sure to click it and see the save settings successfully message appear to apply any changes made.
+
+![](UrBackup/Settings_Saved.png)
+
+A great thing about the settings pages is that any confusing settings have a question next to them which will take you to an FAQ page on your server describing the setting to you. The [UrBackup admin manual](https://www.urbackup.org/administration_manual.html) also contains great detail about all the [server settings](https://www.urbackup.org/administration_manual.html#x1-410008).
+
+These settings are as follows:
+
+- General
+  
+  - Server ([Global Server Settings admin Manual](https://www.urbackup.org/administration_manual.html#x1-420008.1)).
+    
+    - Backup storage path - the default is `/backups` i have left mine as that.
+    
+    - Server URL for client file/backup access/browsing - This is where if you have used custom port numbers you need to use those. If you have not used custom port numbers like myself use the default http port of 55414. Enter `http://<Host name/ IP address>:<port number of http page (default is 55414)>` for completeness mine is `http://hpz240nas.local:2004`. Make sure you set this up to allow access to restoring backups.
+    
+    - Do not do image backups - You could out right disable image backups to this specific server if you wanted to i have not as i want to do image backups.
+    
+    - Do not do file backups  - You could out right disable file backups to this specific server if you wanted to i have not as i want to do file backups.
+    
+    - Automatically shut down server - You can can let your server automatically shut down if you like. I do not have this enabled as I always want it online running backups of my various systems.
+    
+    - Download client from update server - Default is on, i just left it.
+    
+    - Show when a new server version is available - I leave this enabled as it can help me make sure that the container is auto updating.
+    
+    - Auto update clients - This allows the server to tell the clients to automatically update. I leave this enabled so that my clients are always up to date.
+    
+    - Max simultaneous backups - Set a maximum number or backups that can be running at one time. Default is 100. To reduce load on my server i have lowered it to 2.
+    
+    - Max recently active clients - Set a maximum client count. Default is 10000 and I will leave it like that.
+    
+    - Cleanup time window - Here you are able to set when the server will perform its cleanup operation. By default, it is able to do this every day Monday (1) to Sunday (7) between 3 am and 4am with the input `1-7/3-4`. The syntax description can be found in the [admin manual](https://www.urbackup.org/administration_manual.html#x1-610008.3.1) on the UrBackup webpage or by clicking the question mark on your server. I have left the default setting for myself.
+    
+    - Automatically backup UrBackup database - I recommend keeping this active just incase you have an issue with the data base or where it is stored. This will help with recovery in the event of a parts failure.
+    
+    - Total max backup speed for local network - Set a max speed limit for backing up clients on your local network. This maybe needed if you want to reduce the load on your network and your server. I have limited this to 500 MBit/ s. Complex configuration possible please see the [manual section on it](https://www.urbackup.org/administration_manual.html#x1-550008.1.13).
+    
+    - Global soft filesystem quota - Determines when UrBackup starts to remove old backups of clients based on the total space used in the drive. I have changed mine to 90%. Read the [manual section](https://www.urbackup.org/administration_manual.html#x1-560008.1.14) for more info/ a better description of how this works.
+  
+  - File Backups
+    
+    - 
 
 ---
 
-### Windows/ Linux Setup
+## Windows/ Linux Setup
 
 ---
 
-## MAC backups (Time machine)
+## Restoring from image backup
+
+---
+
+# MAC backups (Time machine)
 
 For my MAC I will use a slightly different approach compared to my other systems as MAC devices have the built in system called "time machine". I will be using this application for backups of any MACs.
 
-### Folder Setup
+## Folder Setup
 
 ---
 
-### User Account Setup
+## User Account Setup
 
 ---
 
-### SMB Setup
+## SMB Setup
 
 ---
 
-### Setup on MAC
+## Setup on MAC
 
 ---
