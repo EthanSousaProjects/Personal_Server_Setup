@@ -1290,7 +1290,7 @@ These settings are as follows:
     - Minimal number of fill file backups - I have left mine as the default of 2 just to avoid possible corruption issues that could occur.
     - Excluded files - I have left blank but if you want to exclude files read the section in the [manual](https://www.urbackup.org/administration_manual.html#x1-630008.3.3) or read the FAQ page that your server can take you to.
     - Included files - I have left blank but if you want to make sure some files are included then click and read the FAQ section on your server.
-    - Default directories to backup -  I have left blank but if you want to make sure some directories are included then click and read the FAQ section on your server.
+    - Default directories to backup -  I have changed from a blank setting to `D:\|D_Drive/follow_symlinks,symlinks_optional,share_hashes,optional;C:\|C_Drive/follow_symlinks,symlinks_optional,share_hashes,optional;/|Linux_Root_Drive/follow_symlinks,symlinks_optional,share_hashes,optional`. The directories are separated by `;`. The `C:\` directory is the boot drive for windows. The `D:\` directory is what i typically use when adding a drive to windows. The `|<Name>` is what allows us to name the drive differently and add the directory flags. The `/follow_symlinks,symlinks_optional,share_hashes,optional` is the directory flags to make sure the backup does not fail if the directory does not exist. The `/` before the `|Linux_Root_Drive` is the root directory for Linux. If you want to learn more, click and read the FAQ section on your server and read the [admin manual](https://www.urbackup.org/administration_manual.html#x1-640008.3.4).
     - Directories to backup are optional be default - check box to make the global default directory's optional.
   
   - Image Backups - global settings for image backups to the specific server. Individual clients you can change but this sets the defaults for new clients.
@@ -1311,9 +1311,95 @@ These settings are as follows:
     
     - Image backup file format - I have left this as the default of `Compressed VHD (Compressed non-standard Virtual HardDisk)` to save storage space on my server compared to the other main option `VHD (Virtual HardDisk)`. There are V2 versions as well but as they are in beta at the time of writing I have not used them. If V2 is available without beta I will likely use them to get the newest features.
   
-  - Permissions - All of these settings are about allowing the client to do various things they are as follows. I have left all of them enabled unless otherwise stated.
+  - Permissions - All of these settings are about allowing the client to do various things they are as follows. I have left most enabled but disabled a few. In a business environment you may want to disable certain permissions to stop employees from changing settings.
     
-    - Changing of the dir
+    - Changing of the directories to backup - Disabled as i want all directory's to be backed up and I do not want clients the ability to disable some directories. An admin on the serer side is the only person able to add directories to backup for odd configurations which should be rare in my use case.
+    - Starting of
+      - full file backups
+      - incremental file backups
+      - full image backups
+      - incremental image backups
+    - Viewing of backup logs
+    - pausing of backups
+    - changing of settings - Disabled as I only want the server side to be able to change settings just incase my client side gets hacked. Any custom settings I will get an admin on the server to change.
+    - quit the tray icon
+    - start file restores
+    - configure components to backup
+    - start component restores
+  
+  - Client
+    
+    - Delay after system startup - I have increased mine to 5 mins from the default of 0 to allow the client to come fully online before checking backup status.
+    
+    - Backup window - I have left the default backup window to be 24/7 using the input 1-7/0-24. 1-7 is days of week (Monday = 1 Sunday = 7). Hours are 0-24. You can set custom ones but, I have left as 24/7 for my laptops which are sometimes shutdown. Read the [admin manual](https://www.urbackup.org/administration_manual.html#x1-610008.3.1) for more info.
+    
+    - Perform auto updates silently - Enabled so that i do not have to manually update UrBackup on my clients and i get the latest security updates.
+    
+    - Soft client quota - Default is set to none but, you could want to set this to limit the storage space taken up by clients. It is similar to the server Global soft filesystem quota but client specific. As my clients storage space varies a lot. I have left as blank.
+  
+  - Archive - This is where you can set Archive rules on your server. I will not use this but here is what the page looks like in case you want to use it.
+
+![](Docker_Containers/UrBackup/Global_Archive_Setting.png)
+
+-   General
+  
+  - Alerts - If you want to setup alerts to send to you about your clients backups. There are 2 types as of writing, email based and pulse way based. As I will not be using this I have not changed anything. You can also edit the alert scripts if you wanted too. The following images are what the pages look like:
+
+![](Docker_Containers/UrBackup/Alerts_Default.png)
+
+![](Docker_Containers/UrBackup/Alerts_Pulseway.png)
+
+- General
+  
+  - Local/passive clients
+    
+    - Max backup speed for Local/passive transfers - I have changed this to 100 MBit/s to reduce network load and allow other clients to backup at the same time if required without reaching the max backup speed for local network.
+    
+    - Encrypt local/passive transfers - Enabled and should always be so that if your network was compromised the data flowing through it is not encrypted.
+    
+    - Compress local/ passive transfers - Enabled to reduce network load.
+  
+  - Internet/Active clients - every setting bellow is as an Internet/active client
+    
+    - Clients try to connect via Internet - Enabled
+    
+    - Server URL clients connect to - This is where you have to remember your custom port numbers if used. The default port is `55415` which is the port for internet clients. Here you have to enter `urbackup://<hostname / IP Address>:<port number seen by external computers>` for reference i have typed `urbackup://hpz240nas.local:2005`.
+    
+    - Connect via HTTP(S) proxy - I have left blank as i do not want to connect via a proxy.
+    
+    - Do image backups - enabled
+    
+    - Do full file backups - enabled
+    
+    - Max backup speed - I have set to 25000 KBit/s as my connection to my server maxes out at 100 MBit/s when not on my local network. Therefore, this value allows multiple internet clients to backup simultaneously without  saturating my network.
+    
+    - Total max backup speed - I have set to 70000 KBit/s as my connection maxes out at 100 MBit/s (= 100000 KBit/s) stopping my network from fully saturating when running backups.
+    
+    - Encrypted transfer - Enabled to make sure data cannot be seen in transit
+    
+    - Compressed transfer - Enabled to reduce network load needed.
+    
+    - Beta: Calculate file hashes on client in parallel - Disabled as is a beta feature. When not in Beta will likely enable.
+    
+    - Connect as Internet/active client if connected to as local/passive client - Disabled.
+    
+    - Do not start file backups if current estimated data usage limit per month is smaller than - This is for metered networks which i am not on so i left at the default of 5000 MB.
+    
+    - Do not start image backups if current estimated data usage limit per month is smaller than - This is for metered networks which i am not on so i left at the default of 20000 MB.
+    
+    - Update data limit estimation database - I left enabled.
+    
+    - Restore authentication key - used to help with restoring data. Keep careful note of this.
+  
+  - Advanced - I have left everything on this page as the default. I do not fully understand it so I leave it to you to read up on it and change the settings if you require.
+
+- Mail - This is where you would setup a mail smtp server for things like reports and notifications. As i do no have this i will not run it but please read the [Mail section in the manual](https://www.urbackup.org/administration_manual.html#x1-570008.2). The Settings page looks like the bellow:
+
+![](Docker_Containers/UrBackup/Mail_Settings_Page.png)
+
+- LDAP/AD - Unsure about these settings but they are under under development and testing so may not work. I do not recommend changing these unless you know what you are doing. I have left these settings alone.
+
+- Users - 
 
 ---
 
