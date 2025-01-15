@@ -1371,9 +1371,9 @@ These settings are as follows:
     
     - Do full file backups - enabled
     
-    - Max backup speed - I have set to 25000 KBit/s as my connection to my server maxes out at 100 MBit/s when not on my local network. Therefore, this value allows multiple internet clients to backup simultaneously without  saturating my network.
+    - Max backup speed - I have set to 100000 KBit/s as my connection to my server maxes out at apx 100 MBit/s when not on my local network but on my local network it maxes out at 1 GBit/s. Therefore, as my clients will connect via and internet link, this value allows multiple internet clients to backup simultaneously without saturating my local network. As i am unlikely to run continuously at 100 MBit/s away from my server I am not worried about external connections saturating my network.
     
-    - Total max backup speed - I have set to 70000 KBit/s as my connection maxes out at 100 MBit/s (= 100000 KBit/s) stopping my network from fully saturating when running backups.
+    - Total max backup speed - I have set to 500000 KBit/s as my connection maxes out at 1000 MBit/s (= 1000000 KBit/s) on my local network. As my clients connect via an internet connection due to custom port numbers I have set this equal to my global limit. Although my external network connection maxes out at apx 100 MBit/s (= 100000 KBit/s) I am not worried about fully saturating when running backups as i am unlikely to be able to maintain 100 MBit/s to my server anyway on an external network.
     
     - Encrypted transfer - Enabled to make sure data cannot be seen in transit
     
