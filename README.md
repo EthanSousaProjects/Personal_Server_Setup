@@ -1218,9 +1218,11 @@ On the activities page you will see the currently active tasks that UrBackup is 
 
 ![](Docker_Containers/UrBackup/Activities_Page.png)
 
-On the backups page you will see an overview of off the clients and when the last backups occurred. This is useful to check if all clients have a semi recent backup.
+On the backups page you will see an overview of off the clients and when the last backups occurred. This is useful to check if all clients have a semi recent backup. If you click on a client you will see the file and/or image backup history.
 
 ![](Docker_Containers/UrBackup/Backups_Page.png)
+
+![](Docker_Containers/UrBackup/Client_Backup_History.png)
 
 In the logs page you can see the logs from the activities of the UrBackup server with each client. You can filter by warnings or errors, see the live log for a specific client and when a user is created (done later in my write up) create a report to send of all the logs.
 
@@ -1278,9 +1280,40 @@ These settings are as follows:
     
     - Global soft filesystem quota - Determines when UrBackup starts to remove old backups of clients based on the total space used in the drive. I have changed mine to 90%. Read the [manual section](https://www.urbackup.org/administration_manual.html#x1-560008.1.14) for more info/ a better description of how this works.
   
-  - File Backups
+  - File Backups - global settings for file backups to the specific server. Individual clients you can change but this sets the defaults for new clients.
     
-    - 
+    - Interval for incremental file backups - I have set mine to 12 hours up from the default of 5 to reduce load on running these backups frequently.
+    - Interval for full backups - I have set mine to 60 days up from the 30 day default to reduce network and server load spike frequency.
+    - Maximal number of incremental file backups - Max number of file backups, default of 100 but i have reduced it to 50 to reduce storage space taken up by the client backups. Make sure that the value you set is greater than the Minimal value.
+    - Minimal number of incremental file backups - I have set mine to 20 from a default of 40 to reduce storage space taken up.
+    - Maximal number of full file backups - I have set mine to 4 from a default to 10 to reduce the storage space taken up by clients.
+    - Minimal number of fill file backups - I have left mine as the default of 2 just to avoid possible corruption issues that could occur.
+    - Excluded files - I have left blank but if you want to exclude files read the section in the [manual](https://www.urbackup.org/administration_manual.html#x1-630008.3.3) or read the FAQ page that your server can take you to.
+    - Included files - I have left blank but if you want to make sure some files are included then click and read the FAQ section on your server.
+    - Default directories to backup -  I have left blank but if you want to make sure some directories are included then click and read the FAQ section on your server.
+    - Directories to backup are optional be default - check box to make the global default directory's optional.
+  
+  - Image Backups - global settings for image backups to the specific server. Individual clients you can change but this sets the defaults for new clients.
+    
+    - Interval for incremental image backups - I kept mine at 7 days to keep load on my server low enough while still getting image backups. There is a check box to disable this as well.
+    
+    - Interval for full image backups - I have increased this to 90 days to reduce load on my network and server. There is a check box to disable this as well.
+    
+    - Maximal number of incremental image backups - I reduced mine to 20 to reduce storage usage on my server.
+    
+    - Minimal number of incremental image backups - I have kept mine at 4 to keep decent image backups.
+    
+    - Maximal number of full image backups - I reduced mine to 4 to reduce storage usage on my server.
+    
+    - Minimal number of full image backups - I kept mine at 2 to keep storage usage low and to make sure I have 2 image backups incase 1 gets corrupted.
+    
+    - Volumes to backup - I have changed mine to `ALL_NONUSB` to by default backup all volumes on a pc that are not connected via USB. This is slightly different to the default of C drive for the windows boot drive.
+    
+    - Image backup file format - I have left this as the default of `Compressed VHD (Compressed non-standard Virtual HardDisk)` to save storage space on my server compared to the other main option `VHD (Virtual HardDisk)`. There are V2 versions as well but as they are in beta at the time of writing I have not used them. If V2 is available without beta I will likely use them to get the newest features.
+  
+  - Permissions - All of these settings are about allowing the client to do various things they are as follows. I have left all of them enabled unless otherwise stated.
+    
+    - Changing of the dir
 
 ---
 
