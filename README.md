@@ -1399,9 +1399,21 @@ These settings are as follows:
 
 - LDAP/AD - Unsure about these settings but they are under under development and testing so may not work. I do not recommend changing these unless you know what you are doing. I have left these settings alone.
 
-- Users - 
+- Users - __This part is very important__. As a default, there are no users setup, meaning that there is no login to manage the server side backup interface. It is very important that you setup an admin user as soon as possible so that only you are able to manage your server side backup settings. This is incase your network gets compromised having a login reduces the chance that a hacker could destroy your backups.  On the page create a new user by clicking the button to `Create User`. For the first user created, it will be a default of an admin user. Set a strong password for this admin user saving it in a password manager. Then hit create to create the user.
 
----
+![](Docker_Containers/UrBackup/Users_Setting_Page.png)
+
+![](Docker_Containers/UrBackup/Creating_Sever_Side_User.png)
+
+Now that you have setup an admin user, every time you try to connect to your server you will get a login prompt. This makes your UrBackup server much more secure meaning that only someone with an admin password is able to change the settings.
+
+![](Docker_Containers/UrBackup/Server_Login_Prompt.png)
+
+You can create more admin users if you like which can be very useful in a business environment where you have many IT managers who may need to login to the server and make changes.
+
+You can also make users with admin rights to only control the settings of one client. So an admin is able to change settings for all clients which use the server but a client specific admin is only able to change settings with regards to specific clients. This could be useful in a business environment where you may only want limited access from IT managers to manage only certain clients or as a more secure way to manage clients as you will need multiple passwords to change the settings for all clients.
+
+- Client Settings - Lastly, the last page is client settings. Here you are able to change client specific settings for the clients connected to the server. This is useful if you want to make specific settings for a client that may not be the global setting set under the general tab.
 
 ## Windows/ Linux Setup
 
