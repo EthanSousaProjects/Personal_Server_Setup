@@ -1282,15 +1282,15 @@ These settings are as follows:
   
   - File Backups - global settings for file backups to the specific server. Individual clients you can change but this sets the defaults for new clients.
     
-    - Interval for incremental file backups - I have set mine to 12 hours up from the default of 5 to reduce load on running these backups frequently.
+    - Interval for incremental file backups - I have set mine to 20 hours up from the default of 5 to reduce load on running these backups frequently.
     - Interval for full backups - I have set mine to 60 days up from the 30 day default to reduce network and server load spike frequency.
-    - Maximal number of incremental file backups - Max number of file backups, default of 100 but i have reduced it to 50 to reduce storage space taken up by the client backups. Make sure that the value you set is greater than the Minimal value.
-    - Minimal number of incremental file backups - I have set mine to 20 from a default of 40 to reduce storage space taken up.
-    - Maximal number of full file backups - I have set mine to 4 from a default to 10 to reduce the storage space taken up by clients.
+    - Maximal number of incremental file backups - Max number of file backups, default of 100 but i have reduced it to 10 to reduce storage space taken up by the client backups. Make sure that the value you set is greater than the Minimal value.
+    - Minimal number of incremental file backups - I have set mine to 2 from a default of 40 to reduce storage space taken up.
+    - Maximal number of full file backups - I have set mine to 3 from a default to 10 to reduce the storage space taken up by clients.
     - Minimal number of fill file backups - I have left mine as the default of 2 just to avoid possible corruption issues that could occur.
     - Excluded files - I have left blank but if you want to exclude files read the section in the [manual](https://www.urbackup.org/administration_manual.html#x1-630008.3.3) or read the FAQ page that your server can take you to.
     - Included files - I have left blank but if you want to make sure some files are included then click and read the FAQ section on your server.
-    - Default directories to backup -  I have changed from a blank setting to `D:\|D_Drive/follow_symlinks,symlinks_optional,share_hashes,optional;C:\|C_Drive/follow_symlinks,symlinks_optional,share_hashes,optional;/|Linux_Root_Drive/follow_symlinks,symlinks_optional,share_hashes,optional`. The directories are separated by `;`. The `C:\` directory is the boot drive for windows. The `D:\` directory is what i typically use when adding a drive to windows. The `|<Name>` is what allows us to name the drive differently and add the directory flags. The `/follow_symlinks,symlinks_optional,share_hashes,optional` is the directory flags to make sure the backup does not fail if the directory does not exist. The `/` before the `|Linux_Root_Drive` is the root directory for Linux. If you want to learn more, click and read the FAQ section on your server and read the [admin manual](https://www.urbackup.org/administration_manual.html#x1-640008.3.4).
+    - Default directories to backup -  I have changed from a blank setting to `D:\|D_Drive/follow_symlinks,symlinks_optional,share_hashes,optional;C:\|C_Drive/follow_symlinks,symlinks_optional,share_hashes,optional;/|Linux_Root_Drive/follow_symlinks,symlinks_optional,share_hashes,optional`. The directories are separated by `;`. The `C:\` directory is the boot drive for windows. The `D:\` directory is what i typically use when adding a drive to windows. The `|<Name>` is what allows us to name the drive differently and add the directory flags. The `/follow_symlinks,symlinks_optional,share_hashes,optional` is the directory flags to make sure the backup does not fail if the directory does not exist. The `/` before the `|Linux_Root_Drive` is the root directory for Linux. If you want to learn more, click and read the FAQ section on your server and read the [admin manual](https://www.urbackup.org/administration_manual.html#x1-640008.3.4). (06/03/2025) I made a change to my setup where for my main computer, I set the user directory as the folder to file back up as file backing up all of C and D drives took a lot of storage. However, I  have left this as the global default to to make sure everything gets backed up and will make client specific changes where appropriate. the image backups do the full drives with great compression so they should save me in a complete system data loss.(See client specific settings later on in this doc) (end 06/03/2025 adjustment to doc)
     - Directories to backup are optional be default - check box to make the global default directory's optional.
   
   - Image Backups - global settings for image backups to the specific server. Individual clients you can change but this sets the defaults for new clients.
@@ -1299,11 +1299,11 @@ These settings are as follows:
     
     - Interval for full image backups - I have increased this to 90 days to reduce load on my network and server. There is a check box to disable this as well.
     
-    - Maximal number of incremental image backups - I reduced mine to 20 to reduce storage usage on my server.
+    - Maximal number of incremental image backups - I reduced mine to 5 to reduce storage usage on my server.
     
-    - Minimal number of incremental image backups - I have kept mine at 4 to keep decent image backups.
+    - Minimal number of incremental image backups - I have reduced mine at 2 to reduce storage requirements.
     
-    - Maximal number of full image backups - I reduced mine to 4 to reduce storage usage on my server.
+    - Maximal number of full image backups - I reduced mine to 3 to reduce storage usage on my server.
     
     - Minimal number of full image backups - I kept mine at 2 to keep storage usage low and to make sure I have 2 image backups incase 1 gets corrupted.
     
@@ -1413,7 +1413,7 @@ You can create more admin users if you like which can be very useful in a busine
 
 You can also make users with admin rights to only control the settings of one client. So an admin is able to change settings for all clients which use the server but a client specific admin is only able to change settings with regards to specific clients. This could be useful in a business environment where you may only want limited access from IT managers to manage only certain clients or as a more secure way to manage clients as you will need multiple passwords to change the settings for all clients.
 
-- Client Settings - Lastly, the last page is client settings. Here you are able to change client specific settings for the clients connected to the server. This is useful if you want to make specific settings for a client that may not be the global setting set under the general tab.
+- Client Settings - Lastly, the last page is client settings. Here you are able to change client specific settings for the clients connected to the server. This is useful if you want to make specific settings for a client that may not be the global setting set under the general tab. (06/03/2025) I did make it so that my main computer only file backups the user directory. This PC is windows and the file format to write in the field is `C:\Users\<Your User name>|<Name to give folder>/follow_symlinks,symlinks_optional,share_hashes,optional;`.
 
 ## Windows/ Linux Setup
 
