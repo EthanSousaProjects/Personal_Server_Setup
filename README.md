@@ -441,6 +441,26 @@ I will have a file system with the layout described in the image bellow to help 
 
 It is best practice to create a new folder for each service so that you know exactly where all the data for that service is stored. Once you have created all of your folders remember to apply all the changes.
 
+#### Disk Stats
+
+(Start of 24/03/2025 edit)
+
+OMV by default only tracks the storage usage of drives/ volumes mounted. To track the read and write operations in the OMV web management UI, you must install a plugin called `openmediavault-diskstats`. It can be found in the `System>Plugins` page.
+
+![](Initial_OMV_Install/Disk_Stats_Plugin.png)
+
+Once installed if you navigate to `Diagnostics>Performance Statistics > Disk I/O` you will be able to see disk IO stats for all your drives (as of writing, any drive in a ZFS array does not show up in this page). You can see the following properties over an hour, day, month and year:
+
+- Disk Traffic
+
+- Operations
+
+- Time per operation
+
+![](Initial_OMV_Install/Disk_Stats_Charts.png)
+
+(End of 24/03/2025 edit)
+
 ### Services
 
 _28/09/2024_
@@ -1413,7 +1433,7 @@ You can create more admin users if you like which can be very useful in a busine
 
 You can also make users with admin rights to only control the settings of one client. So an admin is able to change settings for all clients which use the server but a client specific admin is only able to change settings with regards to specific clients. This could be useful in a business environment where you may only want limited access from IT managers to manage only certain clients or as a more secure way to manage clients as you will need multiple passwords to change the settings for all clients.
 
-- Client Settings - Lastly, the last page is client settings. Here you are able to change client specific settings for the clients connected to the server. This is useful if you want to make specific settings for a client that may not be the global setting set under the general tab. (06/03/2025) I did make it so that my main computer only file backups the user directory. This PC is windows and the file format to write in the field is `C:\Users\<Your User name>|<Name to give folder>/follow_symlinks,symlinks_optional,share_hashes,optional;`.
+- Client Settings - Lastly, the last page is client settings. Here you are able to change client specific settings for the clients connected to the server. This is useful if you want to make specific settings for a client that may not be the global setting set under the general tab. (Start of 06/03/2025 Edit ) I did make it so that my main computer only file backups the user directory. This PC is windows and the file format to write in the field is `C:\Users\<Your User name>|<Name to give folder>/follow_symlinks,symlinks_optional,share_hashes,optional;` (End of 06/03/2025 edit).
 
 ## Windows/ Linux Setup
 
