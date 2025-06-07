@@ -780,9 +780,10 @@ We will now see our compose file and edit it. I will be making a few edits to th
 
 My final compose file looked like so:
 
-`---`
+```yaml
+---
 
-`services:
+services:
   heimdall:
     image: lscr.io/linuxserver/heimdall:latest
     container_name: heimdall
@@ -795,7 +796,8 @@ My final compose file looked like so:
     ports:
       - 2001:443
       - 2002:80 #optional
-    restart: unless-stopped`
+    restart: unless-stopped
+```
 
 Yours should look similar. Click save once you are done. Make sure to apply any changes.
 
@@ -1097,9 +1099,10 @@ For now i will be using the recommended compose file to setup my personal UrBack
 
 The [recommend compose file](https://hub.docker.com/r/uroni/urbackup-server) is as of follows:
 
-`version: '2'`
+```yaml
+version: '2'
 
-`services:
+services:
   urbackup:
     image: uroni/urbackup-server:latest
     container_name: urbackup
@@ -1119,7 +1122,8 @@ The [recommend compose file](https://hub.docker.com/r/uroni/urbackup-server) is 
     #  - SYS_ADMIN
     # Uncomment the following two lines if you're using ZFS support
     #devices:
-    #  - /dev/zfs:/dev/zfs`
+    #  - /dev/zfs:/dev/zfs
+```
 
 The changes I will make are as of follows:
 
@@ -1155,9 +1159,10 @@ The changes I will make are as of follows:
 
 So the full compose file for me will look like the following:
 
-`version: '2'`
+```yaml
+version: '2'
 
-`services:
+services:
   urbackup:
     image: uroni/urbackup-server:latest
     container_name: eth_urbackup
@@ -1182,7 +1187,8 @@ So the full compose file for me will look like the following:
     #  - SYS_ADMIN
     # Uncomment the following two lines if you're using ZFS support
     devices:
-      - /dev/zfs:/dev/zfs`
+      - /dev/zfs:/dev/zfs
+```
 
 Modify the compose file as you see fit.
 
@@ -1473,9 +1479,7 @@ Another docker container I will use is [File Browser](https://filebrowser.org/).
 
 ## File setup
 
-The first stage to getting this docker container installed it to setup the config files and database discussed in [their installation instructions](https://filebrowser.org/installation). My first step is setting up a folder in the `local only content folder` space. I will call it `File_Browser` for future reference. My initial file setup is the image bellow:
-
-or the Heimdall image, we need a folder for all of the config files of the container. I will create one on the SSD in the local only content folder so that it has fast access to those files. I will name it `Heimdall` for future reference. My folder setup is the image bellow:
+The first stage to getting this docker container installed it to setup the config files and database discussed in [their installation instructions](https://filebrowser.org/installation). My first step is setting up a folder in the `local only content folder` space on the SSD. I will call it `File_Browser` for future reference. My initial file setup is the image bellow:
 
 ![](Docker_Containers/File_Browser/Config_Folder_Creation.png)
 
@@ -1497,14 +1501,16 @@ Now we need to SSH into our server and navigate to these folders to add some fil
 
 Starting with the config folder, navigate to it then, using the text editor of choice (I will discuss Nano usage) make a file named `settings.json` containing the [baseline config data found on the File Browser GitHub page](https://github.com/filebrowser/filebrowser/blob/master/docker/root/defaults/settings.json). My config is bellow.
 
-`{
+```json
+{
   "port": 80,
   "baseURL": "",
   "address": "",
   "log": "stdout",
   "database": "/database/filebrowser.db",
   "root": "/srv"
-}`
+}
+```
 
 Commands are as follows:
 
@@ -1526,7 +1532,8 @@ The file browser install tutorial does not provide a compose installation method
 
 My final compose file can be found bellow:
 
-`services:
+```yaml
+services:
   filebrowser:
     image: filebrowser/filebrowser:latest
     container_name: filebrowser
@@ -1541,7 +1548,8 @@ My final compose file can be found bellow:
       - /Mass_Storage/HDD_Storage:/srv/HDD_Storage # Extra folder 2 here (HDD space)
       - /srv/dev-disk-by-uuid-00337ac1-aca8-4dc6-b5d7-dfaf50835ac5/SSD_Storage/Local_Only_Content/File_Browser/File_Broswer_Config_DataBase/filebrowser.db:/database/filebrowser.db # users info/settings will be stored here
       - /srv/dev-disk-by-uuid-00337ac1-aca8-4dc6-b5d7-dfaf50835ac5/SSD_Storage/Local_Only_Content/File_Browser/File_Broswer_Config/settings.json:/config/settings.json # config file
-    restart: unless-stopped`
+    restart: unless-stopped
+```
 
 The container is ready to launch. Go into the compose files page and click the up button. You should now be able to see the container up and you should be able to navigate the the webpage on the port you have specified.
 
@@ -1631,6 +1639,243 @@ Once this is done you will see your user added to the list with their scope and 
 
 ![](Docker_Containers/File_Browser/Users.png)
 
-
-
 Now, if you log out and attempt to login with the user you created, you should see  only the contents of the folder in scope and no other files/ folders.
+
+# Pi-hole with Unbound
+
+_07/06/2025_
+
+To make my network more secure and to block ads. I will be using [Pi-hole](https://pi-hole.net/) which is a caching [DNS server](https://www.cloudflare.com/en-gb/learning/dns/what-is-a-dns-server/) typically used for making network wide ad blockers. When you type in a web address (eg. Google.com) you actually need the IP address of the server running the service (eg. 8.8.8.8 for googles DNS service). [Pi-hole](https://pi-hole.net/) acts as this DNS server on your network and gives you the ability to block access to certain DNS queries.
+
+[Unbound](unbound.net) is a recursive DNS server in simple terms, it finds the authoritative DNS server (kind of like the master server that tell everyone else) for any particular domain name and gets the IP address from there. The Pi-hole docs have a good [write up](https://docs.pi-hole.net/guides/dns/unbound/) on Unbound.
+
+I will be setting up two containers for this, one for Unbound and one for Pi-hole which will work together to accomplish this goal.
+
+## File Setup
+
+The first step is to setup the config folders and files for unbound and Pi-hole. I will first make two folders in the `local only content folder` space on the SSD. I will call them `Pihole` and `Unbound` for future reference. An example of me setting up the `Pihole` folder can be seen bellow.
+
+![](Docker_Containers/Pi_Hole_Unbound/Folder_Setup.png)
+
+Make sure to apply the changes.
+
+For the compose files we will need the absolute paths for the database and the config folders/files (we will also need this in a moment for unbound config file setup). This can be found by looking at the absolute paths of the shared folders in the web GUI.
+
+For me I have:
+
+- Pi-hole folder = `/srv/dev-disk-by-uuid-00337ac1-aca8-4dc6-b5d7-dfaf50835ac5/SSD_Storage/Local_Only_Content/Pihole`
+
+- Unbound folder = `/srv/dev-disk-by-uuid-00337ac1-aca8-4dc6-b5d7-dfaf50835ac5/SSD_Storage/Local_Only_Content/Unbound`
+
+Unbound requires a config file to be setup in the unbound folder made above before the container is started. This file is called `unbound.conf` which in my case will contain the config data found in the [Pi-Hole Documentation pages](https://docs.pi-hole.net/guides/dns/unbound/). To do this we need to:
+
+1) SSH into the server
+
+2) Navigate to the directory we created (absolute path found above)
+
+3) Create a file named `unbound.conf` with the info from the [Pi-Hole Documentation pages](https://docs.pi-hole.net/guides/dns/unbound/). (eg. `nano unbound.conf`)
+
+4) Save the file (eg. `CTRL + S` then `CTRL + X`)
+
+Please note the absolute paths as you will need them for the compose file.
+
+## Making Compose file
+
+I will be combining my docker compose files into one file as both containers are intended to be used together.
+
+I will be using the [Matthew Vance unbound docker Image](https://hub.docker.com/r/mvance/unbound). In the [README.md](https://github.com/MatthewVance/unbound-docker) there is an example compose file i have slightly modified as i do not need the `forward-records.conf` and `a-record.conf` files. You may want them so have a read of them. My unbound compose file is as follows, note my changes to the port numbers and volumes. This is mainly due to pi hole using the port 53 therefore unbound will be using 5335 which we defined in the config file.
+
+```yaml
+version: '3'
+services:
+  unbound:
+    container_name: unbound
+    image: "mvance/unbound:latest"
+    ports:
+      - "5335:53/tcp"
+      - "5335:53/udp"
+    volumes:
+      - "/srv/dev-disk-by-uuid-00337ac1-aca8-4dc6-b5d7-dfaf50835ac5/SSD_Storage/Local_Only_Content/Unbound:/opt/unbound/etc/unbound/"
+    restart: unless-stopped
+```
+
+Pi-hole provides a compose file that you can use in their [documentation](https://docs.pi-hole.net/docker/) with further information provided in their [Pi-hole docker README.md](https://github.com/pi-hole/docker-pi-hole). Using this information i have modified their default compose file to work for me. I have not put my actual password for security reasons. You should use a strong password as well I have just left an example in. Have a read of their documentation to add anything you may need. Note my addition of the `FTLCONF_dns_upstreams` environment variable. My compose file is bellow:
+
+```yaml
+# More info at https://github.com/pi-hole/docker-pi-hole/ and https://docs.pi-hole.net/
+services:
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    ports:
+      # DNS Ports
+      - "53:53/tcp"
+      - "53:53/udp"
+      # Default HTTP Port
+      - "2008:80/tcp"
+      # Default HTTPs Port. FTL will generate a self-signed certificate
+      #- "443:443/tcp"
+      # Uncomment the below if using Pi-hole as your DHCP Server
+      #- "67:67/udp"
+      # Uncomment the line below if you are using Pi-hole as your NTP server
+      #- "123:123/udp"
+    environment:
+      # Set the appropriate timezone for your location from
+      # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones, e.g:
+      TZ: 'Europe/London'
+      # Set a password to access the web interface. Not setting one will result in a random password being assigned
+      FTLCONF_webserver_api_password: 'correct horse battery staple'
+      # If using Docker's default `bridge` network setting the dns listening mode should be set to 'all'
+      FTLCONF_dns_listeningMode: 'all'
+      # For linking to unbound dns container as dns upstream.
+      FTLCONF_dns_upstreams: "127.0.0.1#5335"
+    # Volumes store your data between container upgrades
+    volumes:
+      # For persisting Pi-hole's databases and common configuration file
+      - '/srv/dev-disk-by-uuid-00337ac1-aca8-4dc6-b5d7-dfaf50835ac5/SSD_Storage/Local_Only_Content/Pihole:/etc/pihole'
+      # Uncomment the below if you have custom dnsmasq config files that you want to persist. Not needed for most starting fresh with Pi-hole v6. If you're upgrading from v5 you and have used this directory before, you should keep it enabled for the first v6 container start to allow for a complete migration. It can be removed afterwards. Needs environment variable FTLCONF_misc_etc_dnsmasq_d: 'true'
+      #- './etc-dnsmasq.d:/etc/dnsmasq.d'
+    #cap_add:
+      # See https://github.com/pi-hole/docker-pi-hole#note-on-capabilities
+      # Required if you are using Pi-hole as your DHCP server, else not needed
+      #- NET_ADMIN
+      # Required if you are using Pi-hole as your NTP client to be able to set the host's system time
+      #- SYS_TIME
+      # Optional, if Pi-hole should get some more processing time
+      #- SYS_NICE
+    restart: unless-stopped
+```
+
+Now that we have both compose files I will combine them to make the following compose file:
+
+```yaml
+version: '3'
+services:
+  unbound:
+    container_name: unbound
+    image: "mvance/unbound:latest"
+    ports:
+      - "5335:53/tcp"
+      - "5335:53/udp"
+    volumes:
+      - "/srv/dev-disk-by-uuid-00337ac1-aca8-4dc6-b5d7-dfaf50835ac5/SSD_Storage/Local_Only_Content/Unbound:/opt/unbound/etc/unbound/"
+    restart: unless-stopped
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    ports:
+      # DNS Ports
+      - "53:53/tcp"
+      - "53:53/udp"
+      # Default HTTP Port
+      - "2008:80/tcp"
+      # Default HTTPs Port. FTL will generate a self-signed certificate
+      #- "443:443/tcp"
+      # Uncomment the below if using Pi-hole as your DHCP Server
+      #- "67:67/udp"
+      # Uncomment the line below if you are using Pi-hole as your NTP server
+      #- "123:123/udp"
+    environment:
+      # Set the appropriate timezone for your location from
+      # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones, e.g:
+      TZ: 'Europe/London'
+      # Set a password to access the web interface. Not setting one will result in a random password being assigned
+      FTLCONF_webserver_api_password: 'correct horse battery staple'
+      # If using Docker's default `bridge` network setting the dns listening mode should be set to 'all'
+      FTLCONF_dns_listeningMode: 'all'
+      # For linking to unbound dns container as dns upstream.
+      FTLCONF_dns_upstreams: "127.0.0.1#5335"
+    # Volumes store your data between container upgrades
+    volumes:
+      # For persisting Pi-hole's databases and common configuration file
+      - '/srv/dev-disk-by-uuid-00337ac1-aca8-4dc6-b5d7-dfaf50835ac5/SSD_Storage/Local_Only_Content/Pihole:/etc/pihole'
+      # Uncomment the below if you have custom dnsmasq config files that you want to persist. Not needed for most starting fresh with Pi-hole v6. If you're upgrading from v5 you and have used this directory before, you should keep it enabled for the first v6 container start to allow for a complete migration. It can be removed afterwards. Needs environment variable FTLCONF_misc_etc_dnsmasq_d: 'true'
+      #- './etc-dnsmasq.d:/etc/dnsmasq.d'
+    #cap_add:
+      # See https://github.com/pi-hole/docker-pi-hole#note-on-capabilities
+      # Required if you are using Pi-hole as your DHCP server, else not needed
+      #- NET_ADMIN
+      # Required if you are using Pi-hole as your NTP client to be able to set the host's system time
+      #- SYS_TIME
+      # Optional, if Pi-hole should get some more processing time
+      #- SYS_NICE
+    restart: unless-stopped
+```
+
+## Launching, auto Backups and auto update container image
+
+Before we can launch our containers we will encounter an issue with Pi-hole starting as port 53 is used by our OS. Normally by a service called `systemd-resolved`. I found a fix for this from Zopyrus on the [Pi-hole forum](https://discourse.pi-hole.net/t/update-what-to-do-if-port-53-is-already-in-use/52033). To fix this:
+
+1) SSH into your server from a sudo enabled account
+
+2) Stop the service with the command `sudo systemctl stop systemd-resolved` as we make adjustments.
+
+3) edit the file `/etc/systemd/resolved.conf` uncommenting the DNSStubListener line and setting it to no `DNSStubListener=no`.
+
+4) Restart the service using the command `sudo service systemd-resolved restart`
+
+5) Make sure when you restart the server the Pi-hole and unbound container launch correctly as it may not due to this issue.
+
+To launch the Pi-hole and Unbound containers, it will be the same as the previous containers in this guide. Navigate to `Services > Compose > Files`, select the container and select the up button. It will be an arrow pointing up in a circle.
+
+A screen with log commands will appear. Close this when you are done and you will see that the status has changed from `Down` to `Up`. The container is now running.
+
+If like me you have set custom ports it will also show the port numbers.
+
+To automatically backup and update this container image, I will include it in the scheduled task i created for updating containers on reboot. I will navigate to `Services > Compose > Schedule` and click on the scheduled task that at reboot, updates and backups containers that it is filtered for. I will then click the pen like icon to edit the task.
+
+Once in the interface you will manually need to type in the filter as the web UI does not make it easy to select multiple containers. It must be noted that all container names must not include spaces. My filter I have to type `Heimdall,Pi_Hole_Unbound,eth_urbackup,filebrowser` using commas (`,`) to separate out each container. You could also use `*` to do all containers but i do not as some later containers I add will update more frequently then only at reboot which happens once a month for me.
+
+You can check this works by selecting the scheduled task and clicking the run button. A prompt will come up asking you to start the task. Start the task. Log text will appear and at the end will say done.
+
+Now if you navigate to `Services > Compose > Restore` you should see all your containers backed up in the page.
+
+## Using/ Setting up Pi hole
+
+Unbound has been configured already thus we only need to go over Pi-holes settings and configuration in it's web GUI. When you first attempt to login to Pi-hole you must type in `/admin` after the host name and port fields. If not you will not see the admin panel. So my http link is `http://hpz240nas.local:2008/admin`. Login with the password you set for Pi-hole in the compose file. You should now see the Pi-hole home page.
+
+![](Docker_Containers/Pi_Hole_Unbound/Home_Page.png)
+
+So far we do not see anything going though pi hole. To get our whole network to use this Pi-hole instance we will need to change some router settings. You could also do it on a per device basis but this guide will not go over that.
+
+All routers are different so I would recommend looking up how to change the DNS server on your router. However, the process i will take is likely to be similar to what you would have to do.
+
+Find your router IP address or access method (likely 192.168.1.1) a helpful guide can be found at [Security.org](https://www.security.org/vpn/find-router-ip-address/). I know some routers do not have web interfaces directly accessible. If your router is one where you need an app to connect to it use that. Login to the router using the password you have set, the default one (normally `password`) or the one written on it.
+
+Once in the interface, navigate to your DHCP settings/ DNS settings for me it's under the DHCP settings. Once there type in the IP address for your server (my case 192.168.1.112) running Pi-hole as the primary/ first DNS server. I would highly recommend adding a secondary DNS that you are not hosting incase something goes wrong with your Pi-hole/ servers. I have set mine to the cloud flare `1.1.1.1` DNS servers but there are others like googles `8.8.8.8` and many more. I would hesitate against google personally as they are an ad company but i leave what you use up to you.
+
+![](Docker_Containers/Pi_Hole_Unbound/Router_DNS_Settings.png)
+
+Please note that if you used to have another DNS service running on your router before changing it to your Pi-hole instance you will not see any queries for a while until the device reconnects (At least that is what happened with me).
+
+An issue i encountered was the Unbound container logging some errors similar to `[1626249031] unbound[110586:0] warning: so-rcvbuf 1048576 was not granted. Got 425984. To fix: start with root permissions(linux) or sysctl bigger net.core.rmem_max(linux) or kern.ipc.maxsockbuf` causing a TCP error on my Pi-hole instance. 
+
+To fix this i found some people discussing it on [Pi-hole github issues](https://github.com/pi-hole/docs/issues/539), and [a raspberry Pi Unbound docker issue](https://github.com/MatthewVance/unbound-docker-rpi/issues/4). The fix appears to be changing a parameter in the `/etc/sysctl.conf` file or running a command to change it temporarily. The fix instructions can be found bellow.
+
+1) Login in to your server via SSH with a sudo enabled account.
+
+2) Using a text editor (Nano in my example) open the file `/etc/sysctl.conf`.
+
+3) Add the line `net.core.rmem_max=1048576`.
+
+4) Save and exit the file (`CTRL+S`then`CTRL+X` for Nano)
+
+5) Reboot the server or run the command `sysctl -w net.core.rmem_max=1048576`.
+
+6) Relaunch the Pi-hole docker compose file (down then up)
+
+That should fix the error message and the TCP error that appears in Pi-hole occasionally because of it.
+
+### Basic Overview of Pi-hole
+
+Before adding some ad lists we need to do a quick overview of the Pi-hole interface.
+
+On the home screen/ dashboard you will see:
+
+---
+
+### Adding lists (Block and White)
+
+One of the biggest uses of Pi-hole is adding in lists of domains/ IP addresses that 
+
+---
