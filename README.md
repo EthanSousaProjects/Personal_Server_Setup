@@ -1848,7 +1848,7 @@ Once in the interface, navigate to your DHCP settings/ DNS settings for me it's 
 
 Please note that if you used to have another DNS service running on your router before changing it to your Pi-hole instance you will not see any queries for a while until the device reconnects (At least that is what happened with me).
 
-An issue i encountered was the Unbound container logging some errors similar to `[1626249031] unbound[110586:0] warning: so-rcvbuf 1048576 was not granted. Got 425984. To fix: start with root permissions(linux) or sysctl bigger net.core.rmem_max(linux) or kern.ipc.maxsockbuf` causing a TCP error on my Pi-hole instance. 
+An issue i encountered was the Unbound container logging some errors similar to `[1626249031] unbound[110586:0] warning: so-rcvbuf 1048576 was not granted. Got 425984. To fix: start with root permissions(linux) or sysctl bigger net.core.rmem_max(linux) or kern.ipc.maxsockbuf`.
 
 To fix this i found some people discussing it on [Pi-hole github issues](https://github.com/pi-hole/docs/issues/539), and [a raspberry Pi Unbound docker issue](https://github.com/MatthewVance/unbound-docker-rpi/issues/4). The fix appears to be changing a parameter in the `/etc/sysctl.conf` file or running a command to change it temporarily. The fix instructions can be found bellow.
 
@@ -1864,18 +1864,107 @@ To fix this i found some people discussing it on [Pi-hole github issues](https:/
 
 6) Relaunch the Pi-hole docker compose file (down then up)
 
-That should fix the error message and the TCP error that appears in Pi-hole occasionally because of it.
+That should fix the error message.
+
+Another error that I encountered is a TCP error along the lines of `Connection error (127.0.0.1#5335): TCP connection failed (Connection refused)` in Pi-hole. As of the time of writing, this seems to be an on going issue in [Unbound](https://github.com/NLnetLabs/unbound/issues/1237) and [Pi-hole](https://github.com/pi-hole/pi-hole/issues/6079). It appears to be a Pi-hole issue and I would expect it to maybe, be fixed in a future version of the Unbound config file or Pi-hole version. Just make sure you use the most up to date version of each to try and avoid this issue. From reading the issue discussions it appears to not be a major issue and can be ignored.
 
 ### Basic Overview of Pi-hole
 
 Before adding some ad lists we need to do a quick overview of the Pi-hole interface.
 
-On the home screen/ dashboard you will see:
+- On the home screen/ dashboard you will see:
 
----
+![](Docker_Containers/Pi_Hole_Unbound/Home_Page_Filled.png)
+
+- - The total client queries (clicking on it jumps you to the network tools page)
+  
+  - The total client queries block (Clicking on it jumps you to the query logs of everything that was blocked)
+  
+  - The Percentage client queries blocked (Clicking it jumps you to the query log)
+  
+  - Domains on your lists (Clicking on it jumps you to your lists setting page)
+  
+  - A chart of all the client queries over 24 hours. Details the amount and the upstream server type (Should mostly be localhost#5335 if you followed my steps.)
+  
+  - Client activity chart over 24 hours showing the amount of queries by IP address.
+  
+  - Bellow the charts you have two Pi charts on [Query types](https://en.m.wikipedia.org/wiki/List_of_DNS_record_types) and Upstream server usage.
+  
+  - Under the pi charts you have Lists of the:
+    
+    - Top permitted domains
+    
+    - Top Blocked domains
+    
+    - Top clients (total)
+    
+    - Top clients (Blocked only)
+
+- The Next main page is the __Query log__. This page shows all the network queries that have been made to the Pi-hole instance. There are filtering tools if you are curious with specific things. 
+
+- The next main page is the __Group management__ page. This is where you can make groups where you can assign specific block or allow lists to. For example, you could have a default group where you have all your block lists and a personal group with a reduced number of block lists. I will discuss this further in the Section Adding Lists (Block and White).
+
+![](Docker_Containers/Pi_Hole_Unbound/Group_Management.png)
+
+- __Client management__. This is where you can basically assign an IP address a name/ description and change the groups it is assigned to instead of that specific IP address assigned to the default group. This allows you to tailor your devices block lists (eg. child computer has more block lists than adult computer)
+
+![](Docker_Containers/Pi_Hole_Unbound/Client_Management.png)
+
+- __Domain Management__. This is where you can set whole domains (eg. google.com) to allow or block. I personally do not use this so i recommend doing your own research on it.
+
+![](Docker_Containers/Pi_Hole_Unbound/Domain_Management.png)
+
+- __Subscribed Lists group Management__. This is where you add in you block/ allow lists and assign them to groups. I will discuss this in the Adding Lists (Block and White Section bellow)
+
+![](Docker_Containers/Pi_Hole_Unbound/Lists_Page.png)
+
+- __Disable blocking__. This option on the left hand panel disables all block lists on your network. This can be very helpful when you are trying to determine if it is the service you are trying to reach with an issue or your Pi-hole instance blocking access for you. Various time lengths available.
+- __Settings__. These pages are a collection of setting options. Note you can have Basic or Expert mode on. I do not understand many of these options and recommend you to do your own reasurch
+  - System - Shows details on your system running Pi-hole like ip address.
+  - DNS Settings - Should be configured in the docker YAML file already, you should see the Unbound 127.0.0.1#5335 field here.
+  - DHCP - You can run a DHCP server from Pi-hole, unused in my use case.
+  - Web interface/ API settings - Settings related to the web interface of Pi-hole
+  - Privacy - Logging options. I log everything cause it helps with bug/ error finding but if you want to be very secure you should not log anything.
+  - Teleporter - Import/ export Pi-hole config files to another instance.
+  - Local DNS Records - Tell Pi-hole the domain name given to certain IP address. Useful if you want to call a device that only works from IP address by a name. I added my NAS host name as the domain name and attached it's static IP address.
+  - All - See all setting above in one page.
+- Tools - Some tools available in Pi-hole for updating and testing setup.
+  - Pi-hole diagnosis - errors will appear here.
+  - Tail log files - A viewer for the log files.
+  - Update Gravity - A very important tool used to grab the most up to date date from the block/ allow lists you add. If you ever click the update button do not navigate away from the page until it is finished.
+  - Search lists
+  - Interfaces - shows the available interfaces on the Pi-hole instance.
+  - Network - shows the First and last query made by different IP addresses.
+- Donate - A link to the Pi-hole donate page. If you like this software and use it a lot you should consider donating to help fund development on Pi-hole updates and fixes.
 
 ### Adding lists (Block and White)
 
-One of the biggest uses of Pi-hole is adding in lists of domains/ IP addresses that 
+One of the biggest uses of Pi-hole is adding in lists of domains/ IP addresses that are blocked on your network.  I like to use the [Fire bog](https://firebog.net/) block lists.  This website contains links for lists with specific things like Ad lists, Tracking and Telemetry, etc. I will be adding the green lists to my Pi-hole instance under the default group. This lists can sometimes have false positives and block things you actually want. This will require some testing from yourself. There is a thread on Pi-hole about [commonly whitelisted domains](https://discourse.pi-hole.net/t/commonly-whitelisted-domains/212) which i recommend you have a read through.
 
----
+ To add a list to Pi-hole, get a http link of a list (eg. https://adaway.org/hosts.txt ) go into the lists page from the left hand panel in pi hole. Paste the link into the address field, add a comment so you know what the list is about. And assign it to a specific group/s. Once completed click the add to block list/ add to allow list to add the lists. You have now successfully added a list. A tip is to highlight and copy all the links and paste it into Pi-hole instead of 1 by 1. This will give them all the same comment but that is fine for me at least.
+
+![](Docker_Containers/Pi_Hole_Unbound/Adding_List.png)
+
+Add as many lists as you see fit.
+
+__Gravity Update:__
+
+Once you have added all the lists you want. Go into `Tools > Update Gravity` and click the update button to pull the lists data into Pi-hole for usage. Once this button is clicked do not navigate away from the page as it will cause issues. Every once in a while you should come back and run and update gravity to be sure your lists are all up to date.
+
+![](Docker_Containers/Pi_Hole_Unbound/Update_Gravity.png)
+
+### Adding specific group/s to specific client
+
+Sometimes you may want some device with less lists assigned to them or have certain white lists applied to them. We can accomplish this by adding a client via their IP address and adding specific groups to them.
+
+First we may want to make a group for white listing certain domain for yourself. I have named mine `Eth_White`.
+
+![](Docker_Containers/Pi_Hole_Unbound/Adding_Group.png)
+
+Next we have to add a client (please note the client must have a static IP address How i did it for this NAS can be found under the __Router static IP Address setup__ section under the OMV initial install.) For me I know my phone is `192.168.1.106`. Therefore, I will add that as a client in the client setting menu by selecting the IP address, giving it a name/ comment then assigning the Default group to it and the Eth_Whitelist group.
+
+ ![](Docker_Containers/Pi_Hole_Unbound/Adding_Client.png)
+
+Now, any domains/ lists i add to my White lists will contain addresses that I can access on my phone but no other device will have access.
+
+# Libre Speed Test
