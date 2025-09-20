@@ -1667,7 +1667,34 @@ For me I have:
 
 - Unbound folder = `/srv/dev-disk-by-uuid-00337ac1-aca8-4dc6-b5d7-dfaf50835ac5/SSD_Storage/Local_Only_Content/Unbound`
 
-Unbound requires a config file to be setup in the unbound folder made above before the container is started. This file is called `unbound.conf` which in my case will contain the config data found in the [Pi-Hole Documentation pages](https://docs.pi-hole.net/guides/dns/unbound/). To do this we need to:
+Unbound requires a config file to be setup in the unbound folder made above before the container is started. This file is called `unbound.conf` which in my case will contain the config data found in the [Pi-Hole Documentation pages](https://docs.pi-hole.net/guides/dns/unbound/) with minor adjustments and some additional config options bellow:
+
+Credit to [JamesTurland](https://github.com/JamesTurland) for his [youtube video](https://www.youtube.com/watch?v=Y3nm519xHfw) and [GitHub file](https://github.com/JamesTurland/JimsGarage/blob/main/Unbound/unbound.conf) for help with this config file and the compose file discussed later.
+
+```yaml
+    ### Options to addjust:
+    interface: 0.0.0.0@5335
+    port: 53
+
+    ### Additional options to add
+    # Logging options 0 is minium logs but if encountering issues increase to find potenial isses
+    logfile: /var/log/unbound/unbound.log
+    verbosity: 0
+    directory: "/opt/unbound/etc/unbound"
+
+    username: "_unbound"
+
+    # Access control options. Allows the pihole instance to connect to the Unbound instance
+    # If not used Pihole will not be able to use Unbound as upstream server. 
+    access-control: 127.0.0.1/32 allow
+    access-control: 192.168.0.0/16 allow
+    access-control: 172.16.0.0/12 allow
+    access-control: 10.0.0.0/8 allow
+    access-control: fc00::/7 allow
+    access-control: ::1/128 allow
+```
+
+To do this we need to:
 
 1) SSH into the server
 
@@ -1681,7 +1708,7 @@ Please note the absolute paths as you will need them for the compose file.
 
 ## Making Compose file
 
-I will be combining my docker compose files into one file as both containers are intended to be used together.
+I will be combining my docker compose files into one file as both containers are intended to be used together. We will have to configure the docker network so that the pihole container knows where the unbound container is located.
 
 I will be using the [Matthew Vance unbound docker Image](https://hub.docker.com/r/mvance/unbound). In the [README.md](https://github.com/MatthewVance/unbound-docker) there is an example compose file i have slightly modified as i do not need the `forward-records.conf` and `a-record.conf` files. You may want them so have a read of them. My unbound compose file is as follows, note my changes to the port numbers and volumes. This is mainly due to pi hole using the port 53 therefore unbound will be using 5335 which we defined in the config file.
 
@@ -1746,14 +1773,54 @@ services:
     restart: unless-stopped
 ```
 
-Now that we have both compose files I will combine them to make the following compose file:
+Now that we have both compose files I will combine them. We must make a few edits to them so that they have a consistant internal docker network and Pihole is able to reach Unbound.
+
+Credit to [JamesTurland](https://github.com/JamesTurland) for his [youtube video](https://www.youtube.com/watch?v=Y3nm519xHfw) and [GitHub file](https://github.com/JamesTurland/JimsGarage/blob/main/Unbound/docker-compose.yaml) for help with this compose file.
+
+The following parameters need to be added to the respective compose files to make it all work:
 
 ```yaml
-version: '3'
+## For creating a docker bridge network to be used by containers
+networks:
+  dns_net:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 172.27.0.0/16 # Subnet number (specifically the 27) may need to change depending on already running containers. Just increase untill no errors are present.
+
+## In the unbound Service:
+# Used to set a consitant internal network for pihole mainly.
+    networks:
+      dns_net:
+        ipv4_address: 172.27.0.8
+
+## In the Pihole service:
+# Used to set a consistant pi_hole network address
+    networks:
+      dns_net:
+        ipv4_address: 172.27.0.7
+
+# Adjusted from the default in the environment section to get pihole connected to unbound consistantly.
+        FTLCONF_dns_upstreams: "172.27.0.8#5335"
+```
+
+Once all the adjustmnets have been made, the compose file should look something like:
+
+```yaml
+networks:
+  dns_net:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 172.27.0.0/16
+
 services:
   unbound:
     container_name: unbound
     image: "mvance/unbound:latest"
+    networks:
+      dns_net:
+        ipv4_address: 172.27.0.8
     ports:
       - "5335:53/tcp"
       - "5335:53/udp"
@@ -1763,6 +1830,9 @@ services:
   pihole:
     container_name: pihole
     image: pihole/pihole:latest
+    networks:
+      dns_net:
+        ipv4_address: 172.27.0.7
     ports:
       # DNS Ports
       - "53:53/tcp"
@@ -1784,7 +1854,7 @@ services:
       # If using Docker's default `bridge` network setting the dns listening mode should be set to 'all'
       FTLCONF_dns_listeningMode: 'all'
       # For linking to unbound dns container as dns upstream.
-      FTLCONF_dns_upstreams: "127.0.0.1#5335"
+      FTLCONF_dns_upstreams: "172.27.0.8#5335"
     # Volumes store your data between container upgrades
     volumes:
       # For persisting Pi-hole's databases and common configuration file
@@ -1842,11 +1912,21 @@ All routers are different so I would recommend looking up how to change the DNS 
 
 Find your router IP address or access method (likely 192.168.1.1) a helpful guide can be found at [Security.org](https://www.security.org/vpn/find-router-ip-address/). I know some routers do not have web interfaces directly accessible. If your router is one where you need an app to connect to it use that. Login to the router using the password you have set, the default one (normally `password`) or the one written on it.
 
-Once in the interface, navigate to your DHCP settings/ DNS settings for me it's under the DHCP settings. Once there type in the IP address for your server (my case 192.168.1.112) running Pi-hole as the primary/ first DNS server. I would highly recommend adding a secondary DNS that you are not hosting incase something goes wrong with your Pi-hole/ servers. I have set mine to the cloud flare `1.1.1.1` DNS servers but there are others like googles `8.8.8.8` and many more. I would hesitate against google personally as they are an ad company but i leave what you use up to you.
+Once in the interface, navigate to your DHCP settings/ DNS settings for me it's under the DHCP settings. Once there type in the IP address for your server (my case 192.168.1.112) running Pi-hole as the primary/ first DNS server. I would highly recommend adding a secondary DNS as a fail over that you are not hosting incase something goes wrong with your Pi-hole/ servers (ie if router can not connect to pihole it fails over to another DNS server). I have set mine to the cloud flare `1.1.1.1` DNS servers but there are others like googles `8.8.8.8` and many more. I would hesitate against google personally as they are an ad company but i leave what you use up to you. I Noticed my router does not have fail over when it does not see pihole and will fail over if it does not get a DNS query response. Thus, I have elected to only use Pihole as my DNS server option and leave the secondary option blank. This does create an issue where if Pihole is down, there is no DNS resolution for your network which can take the network effectivly offline.
 
 ![](Docker_Containers/Pi_Hole_Unbound/Router_DNS_Settings.png)
 
 Please note that if you used to have another DNS service running on your router before changing it to your Pi-hole instance you will not see any queries for a while until the device reconnects (At least that is what happened with me).
+
+Once everything is seup there are a few tools you should test your setup with:
+
+1) The first of which is the `nslookup` command in linux, Mac and Windows. This will tell you the IP address of a website name (eg. `google.com`) and the DNS server who answered. The firse bit tells you the server IP address that responded to the DNS query. A similar tool can be found in google chrome but entering ` chrome://net-internals/#dns` the URL bar.
+
+![](Docker_Containers/Pi_Hole_Unbound/nslookup_command.png)
+
+2) The secound is a [DNSSEC Resolver Test](https://wander.science/projects/dns/dnssec-resolver-test/). Just run it in your browser. If it is a sucess then everything is working correctly.
+
+3) Lastly a [DNS leak test](https://www.dnsleaktest.com/) should be run to confirm that the only DNS server being used is the one on your computer. You can do this by running one of the tests in your browser. If the only IP address that appears is your own public IP address then it is likely everything is configured correctly.
 
 An issue i encountered was the Unbound container logging some errors similar to `[1626249031] unbound[110586:0] warning: so-rcvbuf 1048576 was not granted. Got 425984. To fix: start with root permissions(linux) or sysctl bigger net.core.rmem_max(linux) or kern.ipc.maxsockbuf`.
 
