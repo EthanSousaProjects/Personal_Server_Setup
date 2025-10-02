@@ -1459,44 +1459,43 @@ To download the binary open the terminal on your Linux machine while being logge
 TF=$(mktemp) && wget "https://hndl.urbackup.org/Client/2.5.26/UrBackup%20Client%20Linux%202.5.26.sh" -O $TF && sudo sh $TF; rm -f $TF
 ```
 
-This will install the UrBackup Linux binary. You may have to restart to finish installation.
+This will install the UrBackup Linux binary. You need to select a snapshot mechanism as part of the install. I recommend the LVM option so that you can get image backups. You may have to restart to finish installation.
 
 Now that the UrBackup client is installed we can interface with it through the terminal with a Sudo enabled account through a variety of commands. The first command to type is `urbackupclientctl -help`. If everything is installed correctly the following message should appear in your terminal:
 
 ```bash
 USAGE:
 
-	urbackupclientctl [--help] [--version] <command> [<args>]
+    urbackupclientctl [--help] [--version] <command> [<args>]
 
 Get specific command help with urbackupclientctl <command> --help
 
-	urbackupclientctl start
-		Start an incremental/full image/file backup
+    urbackupclientctl start
+        Start an incremental/full image/file backup
 
-	urbackupclientctl status
-		Get current backup status
+    urbackupclientctl status
+        Get current backup status
 
-	urbackupclientctl browse
-		Browse backups and files/folders in backups
+    urbackupclientctl browse
+        Browse backups and files/folders in backups
 
-	urbackupclientctl restore-start
-		Restore files/folders from backup
+    urbackupclientctl restore-start
+        Restore files/folders from backup
 
-	urbackupclientctl set-settings
-		Set backup settings
+    urbackupclientctl set-settings
+        Set backup settings
 
-	urbackupclientctl reset-keep
-		Reset keeping files during incremental backups
+    urbackupclientctl reset-keep
+        Reset keeping files during incremental backups
 
-	urbackupclientctl add-backupdir
-		Add new directory to backup set
+    urbackupclientctl add-backupdir
+        Add new directory to backup set
 
-	urbackupclientctl list-backupdirs
-		List directories that are being backed up
+    urbackupclientctl list-backupdirs
+        List directories that are being backed up
 
-	urbackupclientctl remove-backupdir
-		Remove directory from backup set
-
+    urbackupclientctl remove-backupdir
+        Remove directory from backup set
 ```
 
 This shows all the commands available. Running `-help` after any of these commands will detail how to use each to adjust any UrBackup setting you like. I prefer to adjust everything from the main server GUI as I do not allow client PCs to adjust their settings once connected. These commands however allow you to make client specific settings on the client if you wish. Please note you must use `sudo` to adjust any of the settings.
@@ -1516,6 +1515,20 @@ If you installed UrBackup with the normal port configurations then your server h
 6) It may take some time to connect but after some time on the Server UI you should see the client connect and you should see the client showing a message saying connected if you run the following command on the client `sudo urbackupclientctl status`.
 
 The client is now connected. Adjust settings as you see fit. I would recommend checking the file backup directories as the difference between windows and Linux is drastic.
+
+### Linux Client Trouble shooting
+
+When setting up the Linux client you may come across issues with the client connecting to the  like myself here are a few things you could try.
+
+1) You could try editing the settings file to make sure the internet server URL is correct. To do this us a text editor with sudo to access the file stored in `/usr/local/var/urbackup/data/settings.cfg`. Set the internet server to the correct IP address/ URL and set the correct port number in the separate field. Full command = `sudo nano /usr/local/var/urbackup/data/settings.cfg`.
+
+2) Put the server ID in the server settings file. When creating a new client the server will show it's ID. Copy the line given on that page. Then using a text editor like sudo place it in the text file located at `/usr/local/var/urbackup/server_idents.txt`. Full command = `sudo nano /usr/local/var/urbackup/server_idents.txt`.
+
+3) Reset the service by running the command `sudo systemctl stop urbackupclientbackend` waiting a few moments then running `sudo systemctl stop urbackupclientbackend`.
+
+This is what fixed my issues so hopefully it fixes yours as well. Any other issues look into the [FAQ](https://www.urbackup.org/faq.html) or [admin manual](https://www.urbackup.org/administration_manual.html#x1-90002.1.5).
+
+---
 
 ## Restoring from image backup
 
