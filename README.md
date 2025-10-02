@@ -1055,7 +1055,7 @@ Remember to apply the configuration changes once the jobs have been created.
 
 _11/01/2025_
 
-For my windows and Linux based systems I will be running full incremental system backups including all data drives. I do this incase I ever have an issue with my system drives or systems as a whole. This allows me to restore onto all new SSDs or systems (laptops, PCs, VMs) if required. These backups will be needed in a worse case scenario like: the loss of a laptop, hardware failure or a broken install of an OS.
+For my windows and Linux based systems I will be running full incremental system backups including all data drives. I do this in case I ever have an issue with my system drives or systems as a whole. This allows me to restore onto all new SSDs or systems (laptops, PCs, VMs) if required. These backups will be needed in a worse case scenario like: the loss of a laptop, hardware failure or a broken install of an OS.
 
 For the backups of Windows and Linux systems I will be using a program called [UrBackup](https://www.urbackup.org/index.html). This program can do full system backups of Linux, MAC and Windows systems. I will use something else for any MACs which I have described in another section. For individual files/ folders I will run [Syncthing](https://syncthing.net/) on all platforms but, you could use UrBackup for this use case as well. I will discuss Syncthing in a different section when I set it up on this server.
 
@@ -1063,7 +1063,7 @@ For the backups of Windows and Linux systems I will be using a program called [U
 
 To setup [UrBackup](https://www.urbackup.org/index.html), there are a few folders I want to set up first.
 
-As I will eventually include an area for my families computers/ phones, I want to setup a folder in the HDD_Storage area for only myself. Due to how URbackup works this will require me to make a new UrBackup container for my families computers but, as I will use the docker method it should be ok. Some added configuration maybe needed when doing my families PCs.
+As I will eventually include an area for my families computers/ phones, I want to setup a folder in the HDD_Storage area for only myself. Due to how UrBackup works this will require me to make a new UrBackup container for my families computers but, as I will use the docker method it should be ok. Some added configuration maybe needed when doing my families PCs.
 
 As this is mass remote data, I will create an Ethan folder in the `HDD_Storage > Remote_Content` folder (named `Remote_Content_HDD` on my server). When i eventually add my families computers there will be a folder for them as well. The image bellow shows how the folder structure will look for UrBackup for both my family and myself for reference.
 
@@ -1302,11 +1302,11 @@ These settings are as follows:
     
     - Cleanup time window - Here you are able to set when the server will perform its cleanup operation. By default, it is able to do this every day Monday (1) to Sunday (7) between 3 am and 4am with the input `1-7/3-4`. The syntax description can be found in the [admin manual](https://www.urbackup.org/administration_manual.html#x1-610008.3.1) on the UrBackup webpage or by clicking the question mark on your server. I have left the default setting for myself.
     
-    - Automatically backup UrBackup database - I recommend keeping this active just incase you have an issue with the data base or where it is stored. This will help with recovery in the event of a parts failure.
+    - Automatically backup UrBackup database - I recommend keeping this active just in case you have an issue with the data base or where it is stored. This will help with recovery in the event of a parts failure.
     
     - Total max backup speed for local network - Set a max speed limit for backing up clients on your local network. This maybe needed if you want to reduce the load on your network and your server. I have limited this to 500 MBit/ s. Complex configuration possible please see the [manual section on it](https://www.urbackup.org/administration_manual.html#x1-550008.1.13).
     
-    - Global soft filesystem quota - Determines when UrBackup starts to remove old backups of clients based on the total space used in the drive. I have changed mine to 90%. Read the [manual section](https://www.urbackup.org/administration_manual.html#x1-560008.1.14) for more info/ a better description of how this works.
+    - Global soft file system quota - Determines when UrBackup starts to remove old backups of clients based on the total space used in the drive. I have changed mine to 90%. Read the [manual section](https://www.urbackup.org/administration_manual.html#x1-560008.1.14) for more info/ a better description of how this works.
   
   - File Backups - global settings for file backups to the specific server. Individual clients you can change but this sets the defaults for new clients.
     
@@ -1333,9 +1333,9 @@ These settings are as follows:
     
     - Maximal number of full image backups - I reduced mine to 3 to reduce storage usage on my server.
     
-    - Minimal number of full image backups - I kept mine at 2 to keep storage usage low and to make sure I have 2 image backups incase 1 gets corrupted.
+    - Minimal number of full image backups - I kept mine at 2 to keep storage usage low and to make sure I have 2 image backups in case 1 gets corrupted.
     
-    - Volumes to backup - I have changed mine to `ALL_NONUSB` to by default backup all volumes on a pc that are not connected via USB. This is slightly different to the default of C drive for the windows boot drive.
+    - Volumes to backup - I have changed mine to `ALL_NONUSB` to by default backup all volumes on a PC that are not connected via USB. This is slightly different to the default of C drive for the windows boot drive.
     
     - Image backup file format - I have left this as the default of `Compressed VHD (Compressed non-standard Virtual HardDisk)` to save storage space on my server compared to the other main option `VHD (Virtual HardDisk)`. There are V2 versions as well but as they are in beta at the time of writing I have not used them. If V2 is available without beta I will likely use them to get the newest features.
   
@@ -1349,7 +1349,7 @@ These settings are as follows:
       - incremental image backups
     - Viewing of backup logs
     - pausing of backups
-    - changing of settings - Disabled as I only want the server side to be able to change settings just incase my client side gets hacked. Any custom settings I will get an admin on the server to change.
+    - changing of settings - Disabled as I only want the server side to be able to change settings just in case my client side gets hacked. Any custom settings I will get an admin on the server to change.
     - quit the tray icon
     - start file restores
     - configure components to backup
@@ -1363,7 +1363,7 @@ These settings are as follows:
     
     - Perform auto updates silently - Enabled so that i do not have to manually update UrBackup on my clients and i get the latest security updates.
     
-    - Soft client quota - Default is set to none but, you could want to set this to limit the storage space taken up by clients. It is similar to the server Global soft filesystem quota but client specific. As my clients storage space varies a lot. I have left as blank.
+    - Soft client quota - Default is set to none but, you could want to set this to limit the storage space taken up by clients. It is similar to the server Global soft file system quota but client specific. As my clients storage space varies a lot. I have left as blank.
   
   - Archive - This is where you can set Archive rules on your server. I will not use this but here is what the page looks like in case you want to use it.
 
@@ -1421,13 +1421,13 @@ These settings are as follows:
   
   - Advanced - I have left everything on this page as the default. I do not fully understand it so I leave it to you to read up on it and change the settings if you require.
 
-- Mail - This is where you would setup a mail smtp server for things like reports and notifications. As i do no have this i will not run it but please read the [Mail section in the manual](https://www.urbackup.org/administration_manual.html#x1-570008.2). The Settings page looks like the bellow:
+- Mail - This is where you would setup a mail SMTP server for things like reports and notifications. As i do no have this i will not run it but please read the [Mail section in the manual](https://www.urbackup.org/administration_manual.html#x1-570008.2). The Settings page looks like the bellow:
 
 ![](Docker_Containers/UrBackup/Mail_Settings_Page.png)
 
 - LDAP/AD - Unsure about these settings but they are under under development and testing so may not work. I do not recommend changing these unless you know what you are doing. I have left these settings alone.
 
-- Users - __This part is very important__. As a default, there are no users setup, meaning that there is no login to manage the server side backup interface. It is very important that you setup an admin user as soon as possible so that only you are able to manage your server side backup settings. This is incase your network gets compromised having a login reduces the chance that a hacker could destroy your backups.  On the page create a new user by clicking the button to `Create User`. For the first user created, it will be a default of an admin user. Set a strong password for this admin user saving it in a password manager. Then hit create to create the user.
+- Users - __This part is very important__. As a default, there are no users setup, meaning that there is no login to manage the server side backup interface. It is very important that you setup an admin user as soon as possible so that only you are able to manage your server side backup settings. This is in case your network gets compromised having a login reduces the chance that a hacker could destroy your backups.  On the page create a new user by clicking the button to `Create User`. For the first user created, it will be a default of an admin user. Set a strong password for this admin user saving it in a password manager. Then hit create to create the user.
 
 ![](Docker_Containers/UrBackup/Users_Setting_Page.png)
 
@@ -1443,9 +1443,79 @@ You can also make users with admin rights to only control the settings of one cl
 
 - Client Settings - Lastly, the last page is client settings. Here you are able to change client specific settings for the clients connected to the server. This is useful if you want to make specific settings for a client that may not be the global setting set under the general tab. (Start of 06/03/2025 Edit ) I did make it so that my main computer only file backups the user directory. This PC is windows and the file format to write in the field is `C:\Users\<Your User name>|<Name to give folder>/follow_symlinks,symlinks_optional,share_hashes,optional;` (End of 06/03/2025 edit).
 
-## Windows/ Linux Setup
+## Windows Client Setup
 
 ---
+
+## Linux Client Setup
+
+___02/10/2025___
+
+Unfortunately, unlike the windows client which contains a GUI, the Linux client is command line only. To get the Linux client installed you can either install it from source by compiling it yourself or you can install the binary directly through a command. For this guide the binary command will be used as it automatic update from the UrBackup server compatible. Please see the [UrBackup Downloads page](https://www.urbackup.org/download.html) for the most up to date download instructions.
+
+To download the binary open the terminal on your Linux machine while being logged in with a sudo enabled account and run the following command:
+
+```bash
+TF=$(mktemp) && wget "https://hndl.urbackup.org/Client/2.5.26/UrBackup%20Client%20Linux%202.5.26.sh" -O $TF && sudo sh $TF; rm -f $TF
+```
+
+This will install the UrBackup Linux binary. You may have to restart to finish installation.
+
+Now that the UrBackup client is installed we can interface with it through the terminal with a Sudo enabled account through a variety of commands. The first command to type is `urbackupclientctl -help`. If everything is installed correctly the following message should appear in your terminal:
+
+```bash
+USAGE:
+
+	urbackupclientctl [--help] [--version] <command> [<args>]
+
+Get specific command help with urbackupclientctl <command> --help
+
+	urbackupclientctl start
+		Start an incremental/full image/file backup
+
+	urbackupclientctl status
+		Get current backup status
+
+	urbackupclientctl browse
+		Browse backups and files/folders in backups
+
+	urbackupclientctl restore-start
+		Restore files/folders from backup
+
+	urbackupclientctl set-settings
+		Set backup settings
+
+	urbackupclientctl reset-keep
+		Reset keeping files during incremental backups
+
+	urbackupclientctl add-backupdir
+		Add new directory to backup set
+
+	urbackupclientctl list-backupdirs
+		List directories that are being backed up
+
+	urbackupclientctl remove-backupdir
+		Remove directory from backup set
+
+```
+
+This shows all the commands available. Running `-help` after any of these commands will detail how to use each to adjust any UrBackup setting you like. I prefer to adjust everything from the main server GUI as I do not allow client PCs to adjust their settings once connected. These commands however allow you to make client specific settings on the client if you wish. Please note you must use `sudo` to adjust any of the settings.
+
+If you installed UrBackup with the normal port configurations then your server has likely detected your client if they are on the same net. If however you are like me and used a unique install setup then you must configure an internet client on the server and point the client towards the server.
+
+1) The first step in this is to set the clients name. We do this using the command: `sudo urbackupclientctl set-settings --name <Desired Client Name>`. 
+
+2) Once the name is setup go back to your UrBackup Server page and add a new internet client using the name in step 1 in the client name field.
+
+3) Once you click on add client. You will be given installation instructions for Linux and windows and a `default authentication key`. Take note of this key as we will need it for the client side connection.
+
+4) Go back to your client terminal and set the UrBackup server address. We do this through the command `sudo urbackupclientctl set-settings --server-url urbackup://<IP address/ DNS name><:Port Number if using custom ports>`. Make sure the correct port number is used.
+
+5) Our UrBackup client is now pointing to our server. We however are not getting any backups to our server. This is because we still have to use the authentication key retrieved in step 3. If you forgot this you can go into your client specific settings to retrieve it. To save this key for usage we must run the command `sudo urbackupclientctl set-settings --authkey <Unique auth key>`.
+
+6) It may take some time to connect but after some time on the Server UI you should see the client connect and you should see the client showing a message saying connected if you run the following command on the client `sudo urbackupclientctl status`.
+
+The client is now connected. Adjust settings as you see fit. I would recommend checking the file backup directories as the difference between windows and Linux is drastic.
 
 ## Restoring from image backup
 
