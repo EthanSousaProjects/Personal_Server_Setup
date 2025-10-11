@@ -1091,7 +1091,7 @@ Make sure to copy the absolute path of both folders created for the compose file
 
 Note that you may have to show the Absolute path column if it is not appearing already using the table column option button.
 
-![](Docker_Containers/Docker_Containers/Absolute_Folder_Path.png)
+![](Docker_Containers/Absolute_Folder_Path.png)
 
 ## Making Compose File
 
@@ -1445,11 +1445,45 @@ You can also make users with admin rights to only control the settings of one cl
 
 ## Windows Client Setup
 
----
+_11/10/2025_
+
+Now that the server side of the UrBackup system is setup we now need to setup the clients on our systems. There is a windows and Linux Client. Mac does exist but it is in beta and is not recommended due to [Time Machine](https://en.wikipedia.org/wiki/Time_Machine_(macOS)) being built into MACs. See the Section titled "Linux Client Setup" for the Linux setup, this section is windows specific.
+
+To get the windows client installed you have a few options. You can go to the [UrBackup download page](https://www.urbackup.org/download.html) and download the version with the tray icon, and executable without the tray icon and an MSI installer of both as well. You can also use the [chocolatey](https://chocolatey.org/) package manager with the command `choco install urbackup-client`. I personally used [Winget](https://winget.run/pkg/UrBackup/UrBackup.Client) the built in package manager for windows with the command `winget install -e --id UrBackup.UrBackup.Client`. This will be a tray icon version. Install the client with your method of choice. I would recommend using a version with a tray icon as that is how we will interface with everything at the start. 
+
+Once the client is installed with the tray icon you should see a database icon in your tray like the one bellow. It could be red, yellow or white. If you setup yours like me yours is likely red as it does not see the server yet.
+
+![](Docker_Containers/UrBackup/Tray_Icon.png)
+
+To adjust the settings right click on this icon and the options shown bellow are avaliable.
+
+![](Docker_Containers/UrBackup/Windows_Tray_Icons.png)
+
+Most of these options are self explanitory like starting full or incremental backups. One main option I change is `Configure components to backup`, I open this settting and select everything to backup. The other main option is `Settings`. In here you can change any setting that you have seen before on the Server management side of things. You do how ever need to configure the client to point to the server first. You can do this by:
+
+1) Go into the settings page and navigate to the Client Settings section. Once there give the client a name.
+
+![](Docker_Containers/UrBackup/Win_Client_Client_Settings.png)
+
+2) Once the name is setup go back to your UrBackup Server page and add a new internet client using the name in step 1 in the client name field.
+
+3) Once you click on add client. You will be given installation instructions for Linux and windows and a `default authentication key`. Take note of this key as we will need it for the client side connection.
+
+4) Now go back to your client settings and go into the `internet` page. In the relevent fields, type your `authentication key` from step 3 into the field `Internet Server Password`. Also make sure the check mark for `Enable backup via internet` is checked. Finally type in your server URL with the correct port number.  
+
+![](Docker_Containers/UrBackup/Win_Client_Internet_Settings.png)
+
+Once you click OK if you have it setup like me and the client cannot adjust their settings this settings option will disappear. It should also show as connected to the server instance soon after. This can either be seen in the tray icon or the on the server web UI.
+
+Make sure you configure your file backups correctly through the client or server interfaces. I do mine through the server interface as I do not allow clients to edit settings. I backed up just the user directory.
+
+### Windows Client Trouble Shooting
+
+One major issue that gets encounted on the windows side is errors with Onedrive. Even if you have Onedrive fully disabled, there are left over files in the folder which cause issues. The best way to handle this is the disable the one drive folder entirly by adding the wildcard `*\OneDrive\*` to the `Exclude from backup` setting under `File backups`. This stops file backups into the one drive folder eliminating warnings and errors commonly seen in the backup logs.
 
 ## Linux Client Setup
 
-___02/10/2025___
+_02/10/2025_
 
 Unfortunately, unlike the windows client which contains a GUI, the Linux client is command line only. To get the Linux client installed you can either install it from source by compiling it yourself or you can install the binary directly through a command. For this guide the binary command will be used as it automatic update from the UrBackup server compatible. Please see the [UrBackup Downloads page](https://www.urbackup.org/download.html) for the most up to date download instructions.
 
@@ -1528,9 +1562,7 @@ When setting up the Linux client you may come across issues with the client conn
 
 This is what fixed my issues so hopefully it fixes yours as well. Any other issues look into the [FAQ](https://www.urbackup.org/faq.html) or [admin manual](https://www.urbackup.org/administration_manual.html#x1-90002.1.5).
 
----
-
-## Restoring from image backup
+## Restoring from image backup (Windows)
 
 ---
 
