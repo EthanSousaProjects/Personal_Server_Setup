@@ -5,7 +5,7 @@ TODO: Fix linting/formatting in doc 01
 
 TODO: Fix spelling and add to dictionary relevant data in doc 01
 
-_22/05/2024_
+Date written:_22/05/2024_
 
 This guide outlines the path to installing Open Media Vault (OMV) on to the boot drive of an X86 based computer. It must be noted that as of writing, arm platforms have a different install method which can be found on the [OMV Documentation Pages](https://docs.openmediavault.org/). More information not contained in this document can also be found in those pages.
 
