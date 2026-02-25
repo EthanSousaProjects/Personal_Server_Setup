@@ -1,8 +1,8 @@
 # Remote Access Zero tier
 
-TODO: Fix linting/formatting in doc 01
+TODO: Fix linting/formatting in doc 03
 
-TODO: Fix spelling and add to dictionary relevant data in doc 01
+TODO: Fix spelling and add to dictionary relevant data in doc 03
 
 _12/10/2024_
 

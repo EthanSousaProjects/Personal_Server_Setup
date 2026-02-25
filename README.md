@@ -1,4 +1,12 @@
-# Who is this guide For
+# Personal Server Setup
+
+## License
+
+There are two licenses for this project. All code falls under the AGPLV3 license and all documentation/ write up falls under CC-BY-SA license.
+
+I have no affiliation with any project mentioned in these write ups. I just like using the software.
+
+## Who is this guide for
 
 This guide is the path I took to download and install services on my personal Network Attached Server (NAS). This guide is written from the perspective of someone who is somewhat tech literate with Linux and windows but by no means an expert. I am attempting to write these guides so that anyone somewhat tech literate can follow them. I acknowledge that not everyone will be able to follow these guides that i create due to a vast diversity of IT knowledge.
 
@@ -14,7 +22,9 @@ TODO: Fix the linting/ formating of all my docs
 
 TODO: Fix all the spelling in my docs and add the dictionary to the workspace so that they can carry over to git.
 
-# The Server
+TODO: Discuss spelling thing
+
+## The Server
 
 _22/05/2024_
 

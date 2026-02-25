@@ -1,5 +1,9 @@
 # My server backup Plan
 
+TODO: Redo backup plan section. Make the planning aspect one file and make the windows/ linux backup bit one file and the MAC one one file. This is probably the best way to write it.
+
+TODO: Rewrite the plan as it has changed drastically since this was made. Also, mention the backup server repo as part of this.
+
 TODO: Fix linting/formatting in doc 05
 
 TODO: Fix spelling and add to dictionary relevant data in doc 05
