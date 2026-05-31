@@ -1,20 +1,79 @@
 # My server backup Plan
 
-TODO: Redo backup plan section. Make the planning aspect one file and make the windows/ linux backup bit one file and the MAC one one file. This is probably the best way to write it.
-
 TODO: Rewrite the plan as it has changed drastically since this was made. Also, mention the backup server repo as part of this.
 
 TODO: Fix linting/formatting in doc 05
 
+Date Written: 31/05/2026
+TODO: Update date
+
+This guide outlines how my server is backed up. The content included in these backups is everything that is on the NAS which includes:
+
+- OS system drive
+- Docker container configurations
+- Container content (data and databases)
+- External data synced to the NAS
+
+This guide does not go over the configuration or the external machines that data gets synced to. My [local backup server config](https://github.com/EthanSousaProjects/Backup_Server_Setup) can be found which goes over this configuration.
+
+## My robust backup strategy
+
+When you are trying to make robust backups of a sever especially a self hosted NAS, you must create and follow a strong backup strategy. This sub section goes over that strategy which will be applied to all the data.
+
+### 3-2-1 backup rule
+
+The most important aspect of your strategy is to follow the [3-2-1 backup rule](https://www.backblaze.com/blog/the-3-2-1-backup-strategy/). This rule is the defacto standard for robust backups. The basic principle is that to have robust backups you must have:
+
+- __3__ copies of your data on at least
+- __2__ different mediums with at least
+- __1__ off site
+
+In terms of mediums, traditionally this meant different storage formats. For example HDDs and Tape drives. In modern times, this means 2 different computers. This is so that if one computer fails, your data is safe on the other computer. The other important aspect is the 1 off site. This is so that if something like a fire happens in your local home lab, your data is safe offsite.
+
+For my setup, I will be using 2 more minimal servers with HDDs. One will be on the local network while the other will be in another home. I will connect to the remote one via [Zerotier](https://www.zerotier.com/). This will be done via [Rsync](https://docs.openmediavault.org/en/latest/administration/services/rsync.html). This NAS is available 24/7 therefore, the other servers will pull data from this NAS to allow them to shutdown when not pulling data. This saves on power draw reducing my home lab power draw.
+
+Most people use some cloud service as their remote backup target as they are unable to backup content to a server in another home either due to how much data they have to backup or not knowing anyone that is willing to host a server for them. I personally wanted to control all aspects of my home lab as I do not trust uploading data to a cloud service. I also believe it goes against self hosting your data in the first instance. This is why I took my approach. I do however understand that it is not always feasible to take my approach which is while this was mentioned.
+
+### Snapshots
+
+Sometimes, data gets deleted by mistake or corrupted without getting noticed for some time. Therefore, to have a robust backup strategy, you must have snapshots. Snapshots show you the data being backed up at a certain point in time.
+
+I will be using mostly [rsnapshot](https://github.com/OpenMediaVault-Plugin-Developers/openmediavault-rsnapshot) for my snapshotting tool due to it's simplicity and ease of use. Rsnapshot configuration and setup will not be done in this guide. It can however be found in my [local backup server config](https://github.com/EthanSousaProjects/Backup_Server_Setup) guide.
+
+Some other tools within OMV contain snapshotting tools which will be used in addition to [rsnapshot](https://github.com/OpenMediaVault-Plugin-Developers/openmediavault-rsnapshot). They will be discussed in the relevant section.
+
+As snapshots can be storage intensive, this will only be used for the most likely data to need it. Thinks like docker container databases and configuration data will be snapshotted while images and videos from phones will not be snapshotted. Every backup will be analyzed on a case by case basis.
+
+### Backup frequency
+
+The last major component to think about in a backup strategy is how frequent the backups need to occur. Some data, like docker databases, need to be synced frequently due to rapid changes. This is in contrast to things like image and video folders which do not change frequently.
+
+From this, I have come up with three main categories of backups. These categories are as follows:
+
+- __Biweekly__ - For backups of data that can change daily. All data within this category will be snapshotted.
+- __Weekly__ - For backups of data that change frequently. Data within this category will not be snapshotted but may contain already snapshotted backups.
+- __Bimonthly__ - For backups of data that rarely change. None of this data will be snapshotted due to the storage requirement to do so.
+
+Each backup will first be defined by it's category on the external servers to easily identify what type of backup it should be and to keep alike backups organized. For completeness and reference, the bellow lists show the categories of backups and the folder path/s that sits under them. They will be updated as the NAS system and guides develop.
+
+TODO: Fix this lists
+
+- Biweekly
+  - `/SSD_Storage/Remote` - to do ther
+- Weekly
+  - `the s` - theas
+- Bimonthly
+  - `thest` - thes
+
+TODO: OS System Drive fix section fix and write up better.
+TODO: Docker Container configurations and databases
+TODO: External/ large data synced to NAS.
+
 TODO: Fix spelling and add to dictionary relevant data in doc 05
 
-TODO: Separate out the organisation/ chapters of the backup section due to current length.
-
-My Backup plan for my server involves creating snapshots of all my data on the local server and then syncing these files to my local backup server and my remote one.
+## OS System Drive
 
 I will use the [openmediavault-backup plugin](https://github.com/OpenMediaVault-Plugin-Developers/openmediavault-backup) to backup the Open Media Vault system it's self. I will then backup the data drives using the  [rsnapshot plugin](https://github.com/OpenMediaVault-Plugin-Developers/openmediavault-rsnapshot). All data snapshots will be saved to the 2, 8TB HDD mirrored array in a common folder which is then synced to both the local backup server and the remote backup server through likely something like [Syncthing](https://syncthing.net/). A diagram of how my server backup plan will work is shown bellow.
-
-![](Data_Backup/Server_Backup_Plan_Chart.png)
 
 ## Main Server OMV System Backup
 
@@ -45,27 +104,3 @@ Once that change has been made I will go back to the `System > Backup` page will
   - I will enable Scheduled Backups to run Weekly.
   
   - Remember to apply the pending change.
-
-## SSD and HDD storage Snapshots
-
-I will be creating snapshots of all my data which will then be syncing to my local and remote backup servers. These snapshots will be of the SSD and HDD storage areas and stored on the HDDs. I will first install the rsnapshot plugin.
-
-![](Data_Backup/Rsnapshot_Plugin.png)
-
-Once Installed I will navigate to the page `Services > Rsnapshot` to add rsnapshot jobs.
-
-The first job will be for anything stored on the HDDs. The data on the HDDs will be more longer term files compared to the SSD based files. Therefore, I will keep 5 monthly snapshots which will translate to approximately one snapshot a week. All other settings I left as their defaults or set to zero.
-
-![](Data_Backup/HDD_Snapshot_Settings.png)
-
-Next I will create a snapshot job for the SSD data. As this data on the SSDs will update frequently in comparison to the HDDs, I will run 4 weekly snapshots and 3 monthly snapshots. This should give me a snapshot of the data nearly every other day. I will also gain some slightly longer term snapshots just incase i make a mistake in a file and the weekly snapshot gets over written before it is recovered. All other settings I left as their defaults or set to zero.
-
-![](Data_Backup/SSD_Snapshot_Settings.png)
-
-Remember to apply the configuration changes once the jobs have been created.
-
-## Local and Remote snapshot copies
-
-TODO: write up on local and remote snapshot copies.
-TODO: Update and write up this section
----
